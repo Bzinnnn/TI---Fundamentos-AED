@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Hotel Descanso Garantido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1> Relatórios Gerenciais</h1>
+            <p class="subtitle">Visualize estatísticas e indicadores do hotel</p>
+        </div>
+
+        <nav class="nav fade-in">
+            <div class="nav-links">
+                <a href="/" class="nav-link"> Início</a>
+                <a href="/quartos" class="nav-link"> Quartos</a>
+                <a href="/reservas" class="nav-link"> Reservas</a>
+                <a href="/checkin" class="nav-link"> Check-in</a>
+                <a href="/checkout" class="nav-link"> Check-out</a>
+                <a href="/relatorios" class="nav-link active"> Relatórios</a>
+            </div>
+        </nav>
+
+        <!-- Relatório de Ocupação -->
+        <div class="card fade-in">
+            <h2 class="card-title">📈 Relatório de Ocupação</h2>
+            <div class="grid grid-4" id="stats-ocupacao">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatório de Receita -->
+        <div class="card fade-in">
+            <h2 class="card-title">💰 Relatório de Receita</h2>
+            <div class="grid grid-4" id="stats-receita">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico Visual de Ocupação -->
+        <div class="card fade-in">
+            <h2 class="card-title"> Visualização de Ocupação</h2>
+            <div id="grafico-ocupacao">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        // Carregar relatório de ocupação
+        async function carregarRelatorioOcupacao() {
+            const dados = await fetchGet('/api/relatorios/ocupacao');
+            
+            if (dados) {
+                const container = document.getElementById('stats-ocupacao');
+                container.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${dados.total_quartos}</div>
+                        <div class="stat-label">Total de Quartos</div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-value">${dados.quartos_disponiveis}</div>
+                        <div class="stat-label">Quartos Disponíveis</div>
+                    </div>
+                    
+                    <div class="stat-card danger">
+                        <div class="stat-value">${dados.quartos_ocupados}</div>
+                        <div class="stat-label">Quartos Ocupados</div>
+                    </div>
+                    
+                    <div class="stat-card warning">
+                        <div class="stat-value">${dados.taxa_ocupacao.toFixed(1)}%</div>
+                        <div class="stat-label">Taxa de Ocupação</div>
+                    </div>
+                `;
+
+                // Criar gráfico visual
+                criarGraficoOcupacao(dados);
+            }
+        }
+
+        // Carregar relatório de receita
+        async function carregarRelatorioReceita() {
+            const dados = await fetchGet('/api/relatorios/receita');
+            
+            if (dados) {
+                const container = document.getElementById('stats-receita');
+                container.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${formatarMoeda(dados.receita_total)}</div>
+                        <div class="stat-label">Receita Total</div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-value">${formatarMoeda(dados.receita_concluida)}</div>
+                        <div class="stat-label">Receita Concluída</div>
+                    </div>
+                    
+                    <div class="stat-card warning">
+                        <div class="stat-value">${formatarMoeda(dados.receita_pendente)}</div>
+                        <div class="stat-label">Receita Pendente</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${dados.total_reservas}</div>
+                        <div class="stat-label">Total de Reservas</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Criar gráfico visual de ocupação
+        function criarGraficoOcupacao(dados) {
+            const container = document.getElementById('grafico-ocupacao');
+            const total = dados.total_quartos;
+            const disponiveis = dados.quartos_disponiveis;
+            const ocupados = dados.quartos_ocupados;
+            const manutencao = dados.quartos_manutencao;
+
+            const percDisponiveis = total > 0 ? (disponiveis / total * 100).toFixed(1) : 0;
+            const percOcupados = total > 0 ? (ocupados / total * 100).toFixed(1) : 0;
+            const percManutencao = total > 0 ? (manutencao / total * 100).toFixed(1) : 0;
+
+            container.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 10px;">
+                    <h3 style="text-align: center; margin-bottom: 20px; color: #2563eb;">
+                        Distribuição dos Quartos
+                    </h3>
+                    
+                    <!-- Barra de progresso visual -->
+                    <div style="display: flex; height: 50px; border-radius: 10px; overflow: hidden; margin-bottom: 30px;">
+                        <div style="background: #10b981; width: ${percDisponiveis}%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                            ${disponiveis > 0 ? disponiveis : ''}
+                        </div>
+                        <div style="background: #ef4444; width: ${percOcupados}%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                            ${ocupados > 0 ? ocupados : ''}
+                        </div>
+                        <div style="background: #f59e0b; width: ${percManutencao}%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                            ${manutencao > 0 ? manutencao : ''}
+                        </div>
+                    </div>
+
+                    <!-- Legenda -->
+                    <div class="grid grid-3">
+                        <div style="text-align: center;">
+                            <div style="background: #10b981; width: 30px; height: 30px; border-radius: 5px; margin: 0 auto 10px;"></div>
+                            <strong>Disponíveis</strong>
+                            <div>${disponiveis} quartos (${percDisponiveis}%)</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: #ef4444; width: 30px; height: 30px; border-radius: 5px; margin: 0 auto 10px;"></div>
+                            <strong>Ocupados</strong>
+                            <div>${ocupados} quartos (${percOcupados}%)</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background: #f59e0b; width: 30px; height: 30px; border-radius: 5px; margin: 0 auto 10px;"></div>
+                            <strong>Manutenção</strong>
+                            <div>${manutencao} quartos (${percManutencao}%)</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Carregar dados ao iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarRelatorioOcupacao();
+            carregarRelatorioReceita();
+        });
+    </script>
+</body>
+</html>

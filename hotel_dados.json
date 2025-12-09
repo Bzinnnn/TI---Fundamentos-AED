@@ -1,0 +1,69 @@
+{
+    "nome": "Hotel Descanso Garantido",
+    "quartos": [
+        {
+            "numero": 101,
+            "tipo": "Simples",
+            "capacidade": 1,
+            "preco_diaria": 150.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 102,
+            "tipo": "Simples",
+            "capacidade": 1,
+            "preco_diaria": 150.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 103,
+            "tipo": "Simples",
+            "capacidade": 2,
+            "preco_diaria": 180.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 201,
+            "tipo": "Duplo",
+            "capacidade": 2,
+            "preco_diaria": 250.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 202,
+            "tipo": "Duplo",
+            "capacidade": 2,
+            "preco_diaria": 250.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 203,
+            "tipo": "Duplo",
+            "capacidade": 3,
+            "preco_diaria": 300.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 301,
+            "tipo": "Suíte",
+            "capacidade": 2,
+            "preco_diaria": 400.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 302,
+            "tipo": "Suíte",
+            "capacidade": 4,
+            "preco_diaria": 500.0,
+            "status": "Disponível"
+        },
+        {
+            "numero": 303,
+            "tipo": "Suíte",
+            "capacidade": 4,
+            "preco_diaria": 500.0,
+            "status": "Disponível"
+        }
+    ],
+    "reservas": []
+}

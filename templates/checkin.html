@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in - Hotel Descanso Garantido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1> Check-in de Hóspedes</h1>
+            <p class="subtitle">Realize o check-in das reservas confirmadas</p>
+        </div>
+
+        <nav class="nav fade-in">
+            <div class="nav-links">
+                <a href="/" class="nav-link"> Início</a>
+                <a href="/quartos" class="nav-link"> Quartos</a>
+                <a href="/reservas" class="nav-link"> Reservas</a>
+                <a href="/checkin" class="nav-link active"> Check-in</a>
+                <a href="/checkout" class="nav-link"> Check-out</a>
+                <a href="/relatorios" class="nav-link"> Relatórios</a>
+            </div>
+        </nav>
+
+        <!-- Reservas Prontas para Check-in -->
+        <div class="card fade-in">
+            <h2 class="card-title">📋 Reservas Confirmadas</h2>
+            <p style="color: #6b7280; margin-bottom: 20px;">Clique em "Fazer Check-in" para confirmar a entrada do hóspede</p>
+            <div class="table-container" id="tabela-reservas">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p class="mt-20">Carregando reservas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        // Carregar reservas confirmadas
+        async function carregarReservas() {
+            showLoading('tabela-reservas');
+            const reservas = await fetchGet('/api/reservas/ativas');
+            
+            if (reservas) {
+                exibirReservas(reservas);
+            }
+        }
+
+        // Exibir reservas
+        function exibirReservas(reservas) {
+            const container = document.getElementById('tabela-reservas');
+            
+            if (reservas.length === 0) {
+                container.innerHTML = '<p class="text-center">Nenhuma reserva confirmada no momento.</p>';
+                return;
+            }
+
+            let html = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hóspede</th>
+                            <th>CPF</th>
+                            <th>Quarto</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Valor Total</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            reservas.forEach(reserva => {
+                html += `
+                    <tr>
+                        <td><strong>#${reserva.id}</strong></td>
+                        <td>${reserva.nome_hospede}</td>
+                        <td>${formatarCPF(reserva.cpf_hospede)}</td>
+                        <td>${reserva.quarto_numero} - ${reserva.quarto_tipo}</td>
+                        <td>${formatarData(reserva.data_checkin)}</td>
+                        <td>${formatarData(reserva.data_checkout)}</td>
+                        <td><strong>${formatarMoeda(reserva.valor_total)}</strong></td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="fazerCheckin(${reserva.id})">
+                                 Fazer Check-in
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Fazer check-in
+        async function fazerCheckin(id) {
+            if (!confirmar('Confirmar check-in desta reserva?')) {
+                return;
+            }
+
+            const resultado = await fetchPost(`/api/reservas/${id}/checkin`, {});
+
+            if (resultado && resultado.success) {
+                showAlert(resultado.message, 'success');
+                carregarReservas();
+            }
+        }
+
+        // Carregar ao iniciar
+        document.addEventListener('DOMContentLoaded', carregarReservas);
+    </script>
+</body>
+</html>

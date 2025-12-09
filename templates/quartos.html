@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quartos - Hotel Descanso Garantido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1> Gerenciamento de Quartos</h1>
+            <p class="subtitle">Cadastre e gerencie os quartos do hotel</p>
+        </div>
+
+        <nav class="nav fade-in">
+            <div class="nav-links">
+                <a href="/" class="nav-link"> Início</a>
+                <a href="/quartos" class="nav-link active"> Quartos</a>
+                <a href="/reservas" class="nav-link"> Reservas</a>
+                <a href="/checkin" class="nav-link"> Check-in</a>
+                <a href="/checkout" class="nav-link"> Check-out</a>
+                <a href="/relatorios" class="nav-link"> Relatórios</a>
+            </div>
+        </nav>
+
+        <!-- Formulário de Cadastro -->
+        <div class="card fade-in">
+            <h2 class="card-title">➕ Cadastrar Novo Quarto</h2>
+            <form id="form-quarto" class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label">Número do Quarto</label>
+                    <input type="number" class="form-input" id="numero" required min="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="tipo" required>
+                        <option value="">Selecione...</option>
+                        <option value="Simples">Simples</option>
+                        <option value="Duplo">Duplo</option>
+                        <option value="Suíte">Suíte</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Capacidade</label>
+                    <input type="number" class="form-input" id="capacidade" required min="1" max="10">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Preço da Diária (R$)</label>
+                    <input type="number" class="form-input" id="preco" required min="0" step="0.01">
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <button type="submit" class="btn btn-primary">➕ Cadastrar Quarto</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card fade-in">
+            <h2 class="card-title">🔍 Filtrar Quartos</h2>
+            <div class="flex gap-10">
+                <button class="btn btn-primary" onclick="filtrarQuartos('todos')">Todos</button>
+                <button class="btn btn-success" onclick="filtrarQuartos('Disponível')">Disponíveis</button>
+                <button class="btn btn-danger" onclick="filtrarQuartos('Ocupado')">Ocupados</button>
+                <button class="btn btn-warning" onclick="filtrarQuartos('Manutenção')">Manutenção</button>
+            </div>
+        </div>
+
+        <!-- Lista de Quartos -->
+        <div class="card fade-in">
+            <h2 class="card-title">📋 Lista de Quartos</h2>
+            <div class="table-container" id="tabela-quartos">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p class="mt-20">Carregando quartos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        let quartosData = [];
+        let filtroAtual = 'todos';
+
+        // Carregar quartos
+        async function carregarQuartos() {
+            showLoading('tabela-quartos');
+            const quartos = await fetchGet('/api/quartos');
+            
+            if (quartos) {
+                quartosData = quartos;
+                exibirQuartos(quartos);
+            }
+        }
+
+        // Exibir quartos na tabela
+        function exibirQuartos(quartos) {
+            const container = document.getElementById('tabela-quartos');
+            
+            if (quartos.length === 0) {
+                container.innerHTML = '<p class="text-center">Nenhum quarto encontrado.</p>';
+                return;
+            }
+
+            let html = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Capacidade</th>
+                            <th>Preço/Diária</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            quartos.forEach(quarto => {
+                html += `
+                    <tr>
+                        <td><strong>${quarto.numero}</strong></td>
+                        <td>${quarto.tipo}</td>
+                        <td>${quarto.capacidade} pessoa(s)</td>
+                        <td>${formatarMoeda(quarto.preco_diaria)}</td>
+                        <td><span class="badge ${getBadgeClassQuarto(quarto.status)}">${quarto.status}</span></td>
+                        <td>
+                            <select class="form-select" onchange="alterarStatus(${quarto.numero}, this.value)" style="width: auto; padding: 8px;">
+                                <option value="">Alterar status...</option>
+                                <option value="Disponível">Disponível</option>
+                                <option value="Manutenção">Manutenção</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Filtrar quartos
+        function filtrarQuartos(filtro) {
+            filtroAtual = filtro;
+            if (filtro === 'todos') {
+                exibirQuartos(quartosData);
+            } else {
+                const filtrados = quartosData.filter(q => q.status === filtro);
+                exibirQuartos(filtrados);
+            }
+        }
+
+        // Cadastrar quarto
+        document.getElementById('form-quarto').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const dados = {
+                numero: document.getElementById('numero').value,
+                tipo: document.getElementById('tipo').value,
+                capacidade: document.getElementById('capacidade').value,
+                preco: document.getElementById('preco').value
+            };
+
+            const resultado = await fetchPost('/api/quartos', dados);
+
+            if (resultado && resultado.success) {
+                showAlert(resultado.message, 'success');
+                document.getElementById('form-quarto').reset();
+                carregarQuartos();
+            }
+        });
+
+        // Alterar status do quarto
+        async function alterarStatus(numero, novoStatus) {
+            if (!novoStatus) return;
+
+            const resultado = await fetchPut(`/api/quartos/${numero}/status`, {
+                status: novoStatus
+            });
+
+            if (resultado && resultado.success) {
+                showAlert(resultado.message, 'success');
+                carregarQuartos();
+            }
+        }
+
+        // Carregar dados ao iniciar
+        document.addEventListener('DOMContentLoaded', carregarQuartos);
+    </script>
+</body>
+</html>

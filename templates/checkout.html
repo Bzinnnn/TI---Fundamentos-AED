@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-out - Hotel Descanso Garantido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1> Check-out de Hóspedes</h1>
+            <p class="subtitle">Finalize a estadia e libere os quartos</p>
+        </div>
+
+        <nav class="nav fade-in">
+            <div class="nav-links">
+                <a href="/" class="nav-link"> Início</a>
+                <a href="/quartos" class="nav-link"> Quartos</a>
+                <a href="/reservas" class="nav-link"> Reservas</a>
+                <a href="/checkin" class="nav-link"> Check-in</a>
+                <a href="/checkout" class="nav-link active"> Check-out</a>
+                <a href="/relatorios" class="nav-link"> Relatórios</a>
+            </div>
+        </nav>
+
+        <!-- Quartos Ocupados -->
+        <div class="card fade-in">
+            <h2 class="card-title"> Quartos Ocupados</h2>
+            <p style="color: #6b7280; margin-bottom: 20px;">Clique em "Fazer Check-out" para finalizar a estadia</p>
+            <div class="table-container" id="tabela-checkouts">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p class="mt-20">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        // Carregar reservas ativas (com check-in feito)
+        async function carregarCheckouts() {
+            showLoading('tabela-checkouts');
+            const reservas = await fetchGet('/api/reservas/ativas');
+            
+            if (reservas) {
+                exibirCheckouts(reservas);
+            }
+        }
+
+        // Exibir checkouts
+        function exibirCheckouts(reservas) {
+            const container = document.getElementById('tabela-checkouts');
+            
+            if (reservas.length === 0) {
+                container.innerHTML = '<p class="text-center">Nenhum quarto ocupado no momento.</p>';
+                return;
+            }
+
+            let html = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hóspede</th>
+                            <th>CPF</th>
+                            <th>Quarto</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Diárias</th>
+                            <th>Valor Total</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            reservas.forEach(reserva => {
+                const diarias = calcularDiarias(reserva.data_checkin, reserva.data_checkout);
+                
+                html += `
+                    <tr>
+                        <td><strong>#${reserva.id}</strong></td>
+                        <td>${reserva.nome_hospede}</td>
+                        <td>${formatarCPF(reserva.cpf_hospede)}</td>
+                        <td>${reserva.quarto_numero} - ${reserva.quarto_tipo}</td>
+                        <td>${formatarData(reserva.data_checkin)}</td>
+                        <td>${formatarData(reserva.data_checkout)}</td>
+                        <td>${diarias} dia(s)</td>
+                        <td><strong>${formatarMoeda(reserva.valor_total)}</strong></td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="fazerCheckout(${reserva.id}, ${reserva.valor_total})">
+                                 Fazer Check-out
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Fazer check-out
+        async function fazerCheckout(id, valorTotal) {
+            const confirmarMsg = `Confirmar check-out?\n\nValor a receber: ${formatarMoeda(valorTotal)}`;
+            
+            if (!confirmar(confirmarMsg)) {
+                return;
+            }
+
+            const resultado = await fetchPost(`/api/reservas/${id}/checkout`, {});
+
+            if (resultado && resultado.success) {
+                showAlert(`${resultado.message} - Valor recebido: ${formatarMoeda(resultado.valor_total)}`, 'success');
+                carregarCheckouts();
+            }
+        }
+
+        // Carregar ao iniciar
+        document.addEventListener('DOMContentLoaded', carregarCheckouts);
+    </script>
+</body>
+</html>

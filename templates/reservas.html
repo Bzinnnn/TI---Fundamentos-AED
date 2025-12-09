@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas - Hotel Descanso Garantido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1> Gerenciamento de Reservas</h1>
+            <p class="subtitle">Crie e gerencie reservas de quartos</p>
+        </div>
+
+        <nav class="nav fade-in">
+            <div class="nav-links">
+                <a href="/" class="nav-link"> Início</a>
+                <a href="/quartos" class="nav-link"> Quartos</a>
+                <a href="/reservas" class="nav-link active"> Reservas</a>
+                <a href="/checkin" class="nav-link"> Check-in</a>
+                <a href="/checkout" class="nav-link"> Check-out</a>
+                <a href="/relatorios" class="nav-link"> Relatórios</a>
+            </div>
+        </nav>
+
+        <!-- Formulário de Nova Reserva -->
+        <div class="card fade-in">
+            <h2 class="card-title">➕ Nova Reserva</h2>
+            <form id="form-reserva">
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Nome do Hóspede</label>
+                        <input type="text" class="form-input" id="nome" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">CPF (apenas números)</label>
+                        <input type="text" class="form-input" id="cpf" required maxlength="11" placeholder="12345678901">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Data de Check-in</label>
+                        <input type="date" class="form-input" id="data_checkin" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Data de Check-out</label>
+                        <input type="date" class="form-input" id="data_checkout" required>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Selecione o Quarto</label>
+                        <div id="quartos-disponiveis" class="grid grid-3">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Carregando quartos...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <button type="submit" class="btn btn-primary"> Fazer Reserva</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Buscar por CPF -->
+        <div class="card fade-in">
+            <h2 class="card-title">🔍 Buscar Reservas por CPF</h2>
+            <div class="flex gap-10">
+                <input type="text" class="form-input" id="cpf-busca" placeholder="Digite o CPF" maxlength="11" style="flex: 1;">
+                <button class="btn btn-primary" onclick="buscarPorCPF()">🔍 Buscar</button>
+            </div>
+        </div>
+
+        <!-- Lista de Reservas -->
+        <div class="card fade-in">
+            <h2 class="card-title">📋 Todas as Reservas</h2>
+            <div class="flex gap-10 mb-20">
+                <button class="btn btn-primary" onclick="filtrarReservas('todas')">Todas</button>
+                <button class="btn btn-success" onclick="filtrarReservas('Confirmada')">Confirmadas</button>
+                <button class="btn btn-warning" onclick="filtrarReservas('Pendente')">Pendentes</button>
+                <button class="btn btn-secondary" onclick="filtrarReservas('Cancelada')">Canceladas</button>
+            </div>
+            <div class="table-container" id="tabela-reservas">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p class="mt-20">Carregando reservas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        let reservasData = [];
+        let quartoSelecionado = null;
+
+        // Carregar quartos disponíveis
+        async function carregarQuartosDisponiveis() {
+            const quartos = await fetchGet('/api/quartos/disponiveis');
+            const container = document.getElementById('quartos-disponiveis');
+            
+            if (quartos && quartos.length > 0) {
+                let html = '';
+                quartos.forEach(quarto => {
+                    html += `
+                        <div class="card" style="padding: 15px; cursor: pointer; border: 2px solid transparent;" 
+                             onclick="selecionarQuarto(${quarto.numero})" 
+                             id="quarto-${quarto.numero}">
+                            <h4>Quarto ${quarto.numero}</h4>
+                            <p>${quarto.tipo}</p>
+                            <p><strong>${formatarMoeda(quarto.preco_diaria)}/diária</strong></p>
+                            <p style="font-size: 0.9rem;">Cap.: ${quarto.capacidade} pessoa(s)</p>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p class="text-center">Nenhum quarto disponível no momento.</p>';
+            }
+        }
+
+        // Selecionar quarto
+        function selecionarQuarto(numero) {
+            // Remove seleção anterior
+            if (quartoSelecionado) {
+                const anteriorEl = document.getElementById(`quarto-${quartoSelecionado}`);
+                if (anteriorEl) {
+                    anteriorEl.style.borderColor = 'transparent';
+                    anteriorEl.style.background = 'white';
+                }
+            }
+
+            // Adiciona nova seleção
+            quartoSelecionado = numero;
+            const element = document.getElementById(`quarto-${numero}`);
+            if (element) {
+                element.style.borderColor = '#2563eb';
+                element.style.background = '#eff6ff';
+            }
+        }
+
+        // Fazer reserva
+        document.getElementById('form-reserva').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!quartoSelecionado) {
+                showAlert('Por favor, selecione um quarto!', 'warning');
+                return;
+            }
+
+            const cpf = limparCPF(document.getElementById('cpf').value);
+            if (!validarCPF(cpf)) {
+                showAlert('CPF inválido!', 'error');
+                return;
+            }
+
+            const dados = {
+                nome: document.getElementById('nome').value,
+                cpf: cpf,
+                numero_quarto: quartoSelecionado,
+                data_checkin: document.getElementById('data_checkin').value,
+                data_checkout: document.getElementById('data_checkout').value
+            };
+
+            const resultado = await fetchPost('/api/reservas', dados);
+
+            if (resultado && resultado.success) {
+                showAlert(`Reserva #${resultado.reserva.id} criada com sucesso! Valor: ${formatarMoeda(resultado.reserva.valor_total)}`, 'success');
+                document.getElementById('form-reserva').reset();
+                quartoSelecionado = null;
+                carregarQuartosDisponiveis();
+                carregarReservas();
+            }
+        });
+
+        // Carregar reservas
+        async function carregarReservas() {
+            showLoading('tabela-reservas');
+            const reservas = await fetchGet('/api/reservas');
+            
+            if (reservas) {
+                reservasData = reservas;
+                exibirReservas(reservas);
+            }
+        }
+
+        // Exibir reservas
+        function exibirReservas(reservas) {
+            const container = document.getElementById('tabela-reservas');
+            
+            if (reservas.length === 0) {
+                container.innerHTML = '<p class="text-center">Nenhuma reserva encontrada.</p>';
+                return;
+            }
+
+            let html = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hóspede</th>
+                            <th>Quarto</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            reservas.forEach(reserva => {
+                html += `
+                    <tr>
+                        <td><strong>#${reserva.id}</strong></td>
+                        <td>${reserva.nome_hospede}</td>
+                        <td>${reserva.quarto_numero} - ${reserva.quarto_tipo}</td>
+                        <td>${formatarData(reserva.data_checkin)}</td>
+                        <td>${formatarData(reserva.data_checkout)}</td>
+                        <td>${formatarMoeda(reserva.valor_total)}</td>
+                        <td><span class="badge ${getBadgeClassReserva(reserva.status)}">${reserva.status}</span></td>
+                        <td>
+                            ${reserva.status === 'Confirmada' || reserva.status === 'Pendente' ? 
+                                `<button class="btn btn-danger btn-sm" onclick="cancelarReserva(${reserva.id})">Cancelar</button>` 
+                                : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Filtrar reservas
+        function filtrarReservas(filtro) {
+            if (filtro === 'todas') {
+                exibirReservas(reservasData);
+            } else {
+                const filtradas = reservasData.filter(r => r.status === filtro);
+                exibirReservas(filtradas);
+            }
+        }
+
+        // Cancelar reserva
+        async function cancelarReserva(id) {
+            if (!confirmar('Deseja realmente cancelar esta reserva?')) {
+                return;
+            }
+
+            const resultado = await fetchPost(`/api/reservas/${id}/cancelar`, {});
+
+            if (resultado && resultado.success) {
+                showAlert(resultado.message, 'success');
+                carregarReservas();
+                carregarQuartosDisponiveis();
+            }
+        }
+
+        // Buscar por CPF
+        async function buscarPorCPF() {
+            const cpf = limparCPF(document.getElementById('cpf-busca').value);
+            
+            if (!validarCPF(cpf)) {
+                showAlert('CPF inválido!', 'error');
+                return;
+            }
+
+            const reservas = await fetchGet(`/api/reservas/hospede/${cpf}`);
+            
+            if (reservas) {
+                if (reservas.length === 0) {
+                    showAlert('Nenhuma reserva encontrada para este CPF.', 'info');
+                } else {
+                    exibirReservas(reservas);
+                    showAlert(`${reservas.length} reserva(s) encontrada(s).`, 'success');
+                }
+            }
+        }
+
+        // Definir data mínima como hoje
+        document.addEventListener('DOMContentLoaded', () => {
+            const hoje = getDataHoje();
+            document.getElementById('data_checkin').min = hoje;
+            document.getElementById('data_checkout').min = hoje;
+            
+            carregarQuartosDisponiveis();
+            carregarReservas();
+        });
+    </script>
+</body>
+</html>
