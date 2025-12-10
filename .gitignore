@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files (exclude actual data but keep folder structure)
+data/*.json
+!data/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*_antigo.py
+*_backup.py
+*.bak
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/

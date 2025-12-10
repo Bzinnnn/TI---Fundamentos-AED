@@ -12,7 +12,7 @@
 └────────────────────────────────────────────────────────────────────────────────┘
 
 📂 CÓDIGO FONTE (Python)
-├── 🔵 main.py                 - Arquivo principal do sistema
+├── 🔵 main.py                 - Arquivo principal do sistema (Interface Console)
 ├── 🔵 hotel.py                - Gerenciamento central do hotel  
 ├── 🔵 quarto.py               - Classe Quarto
 ├── 🔵 reserva.py              - Classe Reserva
@@ -27,7 +27,7 @@
 └── 📔 APRESENTACAO.md         - Apresentação do trabalho
 
 📂 CONFIGURAÇÃO
-└── 📄 requirements.txt        - Dependências (vazio - só Python padrão)
+└── 📄 requirements.txt        - Dependências (NENHUMA - só Python padrão!)
 
 
 ┌────────────────────────────────────────────────────────────────────────────────┐
@@ -71,12 +71,12 @@
 1️⃣  Abra o terminal/PowerShell
 
 2️⃣  Navegue até a pasta do projeto:
-    cd "c:\Users\Bernardo\Desktop\TI - Fundamentos\TI---Fundamentos-AED"
+    cd "d:\Pessoal\PUC\FTC\TrabalhoFTC\TI---Fundamentos-AED"
 
 3️⃣  Execute o sistema:
     python main.py
 
-4️⃣  Navegue pelo menu interativo!
+4️⃣  Navegue pelo menu interativo no console!
 
 💡 DICA: Execute primeiro os testes para verificar se tudo está OK:
     python testes.py

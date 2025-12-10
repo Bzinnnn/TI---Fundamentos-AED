@@ -293,7 +293,7 @@ O sistema criará automaticamente 9 quartos de exemplo na primeira execução.
 ### Técnicas
 - [ ] Banco de dados SQL
 - [ ] API REST
-- [ ] Sistema web
+- [ ] Interface gráfica (GUI)
 - [ ] Autenticação de usuários
 - [ ] Logs de auditoria
 - [ ] Notificações por email
