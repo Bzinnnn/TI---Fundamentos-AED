@@ -1,10 +1,11 @@
-# testes.py - BATERIA DE TESTES
+# testes_unittest.py - BATERIA DE TESTES
 # Conforme especificacao do PDF - Adequado para primeiro periodo
+# Usando unittest (biblioteca padrao do Python)
 
 from datetime import date, timedelta
 import sys
 import os
-import time
+import unittest
 
 # Adiciona o diretorio raiz ao path para importar os modulos
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -15,572 +16,561 @@ from src.models.funcionario import Funcionario
 from src.models.quarto import Quarto
 from src.models.estadia import Estadia
 
-def teste_clientes():
-    """Testa TODAS as funcionalidades relacionadas a clientes"""
-    print("\n" + "=" * 70)
-    print("TESTANDO CLIENTES - BATERIA COMPLETA (6 testes)")
-    print("=" * 70)
-    
-    inicio = time.time()
-    hotel = Hotel("Hotel Teste")
-    
-    # TESTE 1: Cadastrar clientes com codigo auto-gerado
-    print("\n[TC-CLI-001] Cadastrando clientes (codigo auto-gerado)...")
-    c1 = hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
-    c2 = hotel.cadastrar_cliente("João Santos", "Av B, 456", "31988882222")
-    c3 = hotel.cadastrar_cliente("Ana Costa", "Praca C, 789", "31977773333")
-    assert c1.codigo == 1, "Codigo do primeiro cliente deve ser 1"
-    assert c2.codigo == 2, "Codigo do segundo cliente deve ser 2"
-    assert c3.codigo == 3, "Codigo do terceiro cliente deve ser 3"
-    print("✓ PASSOU - 3 clientes cadastrados com codigos 1, 2, 3")
-    
-    # TESTE 2: Validar que nao ha codigos duplicados
-    print("\n[TC-CLI-002] Validando unicidade de codigos...")
-    codigos = [c.codigo for c in hotel.clientes]
-    assert len(codigos) == len(set(codigos)), "Nao deve haver codigos duplicados"
-    print(f"✓ PASSOU - {len(codigos)} codigos unicos validados")
-    
-    # TESTE 3: Buscar cliente por codigo existente
-    print("\n[TC-CLI-003] Buscando cliente por codigo existente...")
-    cliente = hotel.buscar_cliente_por_codigo(1)
-    assert cliente is not None, "Deve encontrar cliente"
-    assert cliente.nome == "Maria Silva", "Nome deve corresponder"
-    assert cliente.codigo == 1, "Codigo deve corresponder"
-    print(f"✓ PASSOU - Cliente encontrado: {cliente.nome} (codigo: {cliente.codigo})")
-    
-    # TESTE 4: Pesquisar por nome (parcial)
-    print("\n[TC-CLI-004] Pesquisando por nome parcial...")
-    resultado = hotel.pesquisar_cliente("Maria")
-    assert len(resultado) == 1, "Deve encontrar 1 cliente"
-    assert resultado[0].nome == "Maria Silva", "Deve ser Maria Silva"
-    print(f"✓ PASSOU - Pesquisa 'Maria' retornou {len(resultado)} resultado")
-    
-    # TESTE 5: Listar todos os clientes
-    print("\n[TC-CLI-005] Listando todos os clientes...")
-    todos = hotel.listar_clientes()
-    assert len(todos) == 3, "Deve ter 3 clientes"
-    print(f"✓ PASSOU - Lista retornou {len(todos)} clientes cadastrados")
-    
-    # TESTE 6: Validar estrutura do cliente (PDF)
-    print("\n[TC-CLI-006] Validando estrutura do cliente conforme PDF...")
-    assert hasattr(c1, 'codigo'), "Cliente deve ter codigo"
-    assert hasattr(c1, 'nome'), "Cliente deve ter nome"
-    assert hasattr(c1, 'endereco'), "Cliente deve ter endereco"
-    assert hasattr(c1, 'telefone'), "Cliente deve ter telefone"
-    print("✓ PASSOU - Campos obrigatorios: codigo, nome, endereco, telefone")
-    
-    tempo = time.time() - inicio
-    print("\n" + "=" * 70)
-    print(f"✓✓✓ TODOS OS TESTES DE CLIENTES PASSARAM! (6/6) [{tempo:.3f}s]")
-    print("=" * 70)
 
-def teste_funcionarios():
-    """Testa TODAS as funcionalidades relacionadas a funcionarios"""
-    print("\n" + "=" * 70)
-    print("TESTANDO FUNCIONARIOS - BATERIA COMPLETA (6 testes)")
-    print("=" * 70)
+class TestClientes(unittest.TestCase):
+    """Testa TODAS as funcionalidades relacionadas a clientes (6 testes)"""
     
-    inicio = time.time()
-    hotel = Hotel("Hotel Teste")
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
     
-    # TESTE 1: Cadastrar funcionarios com codigo auto-gerado
-    print("\n[TC-FUNC-001] Cadastrando funcionarios (codigo auto-gerado)...")
-    f1 = hotel.cadastrar_funcionario("Ana Costa", "31977773333", "Recepcionista", 2500.00)
-    f2 = hotel.cadastrar_funcionario("Carlos Souza", "31966664444", "Gerente", 5000.00)
-    f3 = hotel.cadastrar_funcionario("Maria Lima", "31955555555", "Auxiliar de limpeza", 1800.00)
-    f4 = hotel.cadastrar_funcionario("Jose Silva", "31944446666", "Garçom", 2000.00)
-    assert f1.codigo == 1, "Primeiro funcionario codigo 1"
-    assert f2.codigo == 2, "Segundo funcionario codigo 2"
-    assert f3.codigo == 3, "Terceiro funcionario codigo 3"
-    assert f4.codigo == 4, "Quarto funcionario codigo 4"
-    print("✓ PASSOU - 4 funcionarios (Recepcionista, Gerente, Auxiliar, Garçom)")
+    def test_01_cadastrar_clientes_codigo_auto_gerado(self):
+        """TC-CLI-001: Cadastrar clientes com codigo auto-gerado"""
+        c1 = self.hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
+        c2 = self.hotel.cadastrar_cliente("João Santos", "Av B, 456", "31988882222")
+        c3 = self.hotel.cadastrar_cliente("Ana Costa", "Praca C, 789", "31977773333")
+        
+        self.assertEqual(c1.codigo, 1, "Codigo do primeiro cliente deve ser 1")
+        self.assertEqual(c2.codigo, 2, "Codigo do segundo cliente deve ser 2")
+        self.assertEqual(c3.codigo, 3, "Codigo do terceiro cliente deve ser 3")
     
-    # TESTE 2: Validar unicidade de codigos
-    print("\n[TC-FUNC-002] Validando unicidade de codigos...")
-    codigos = [f.codigo for f in hotel.funcionarios]
-    assert len(codigos) == len(set(codigos)), "Codigos devem ser unicos"
-    print(f"✓ PASSOU - {len(codigos)} codigos unicos")
+    def test_02_validar_unicidade_codigos(self):
+        """TC-CLI-002: Validar que nao ha codigos duplicados"""
+        self.hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
+        self.hotel.cadastrar_cliente("João Santos", "Av B, 456", "31988882222")
+        self.hotel.cadastrar_cliente("Ana Costa", "Praca C, 789", "31977773333")
+        
+        codigos = [c.codigo for c in self.hotel.clientes]
+        self.assertEqual(len(codigos), len(set(codigos)), "Nao deve haver codigos duplicados")
     
-    # TESTE 3: Buscar funcionario por codigo
-    print("\n[TC-FUNC-003] Buscando funcionario por codigo...")
-    func = hotel.buscar_funcionario_por_codigo(1)
-    assert func is not None, "Deve encontrar"
-    assert func.cargo == "Recepcionista", "Cargo deve corresponder"
-    assert func.salario == 2500.00, "Salario deve corresponder"
-    print(f"✓ PASSOU - Encontrado: {func.nome} - {func.cargo} - R${func.salario:.2f}")
+    def test_03_buscar_cliente_por_codigo(self):
+        """TC-CLI-003: Buscar cliente por codigo existente"""
+        c1 = self.hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
+        
+        cliente = self.hotel.buscar_cliente_por_codigo(c1.codigo)
+        self.assertIsNotNone(cliente, "Deve encontrar cliente")
+        self.assertEqual(cliente.nome, "Maria Silva", "Nome deve corresponder")
+        self.assertEqual(cliente.codigo, c1.codigo, "Codigo deve corresponder")
     
-    # TESTE 4: Buscar funcionario inexistente
-    print("\n[TC-FUNC-004] Buscando funcionario inexistente...")
-    func = hotel.buscar_funcionario_por_codigo(999)
-    assert func is None, "Deve retornar None"
-    print("✓ PASSOU - Retornou None para codigo 999 (inexistente)")
+    def test_04_pesquisar_por_nome_parcial(self):
+        """TC-CLI-004: Pesquisar por nome parcial"""
+        self.hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
+        self.hotel.cadastrar_cliente("João Santos", "Av B, 456", "31988882222")
+        
+        resultado = self.hotel.pesquisar_cliente("Maria")
+        self.assertEqual(len(resultado), 1, "Deve encontrar 1 cliente")
+        self.assertEqual(resultado[0].nome, "Maria Silva", "Deve ser Maria Silva")
     
-    # TESTE 5: Pesquisar por nome
-    print("\n[TC-FUNC-005] Pesquisando funcionario por nome...")
-    resultado = hotel.pesquisar_funcionario("Carlos")
-    assert len(resultado) >= 1, "Deve encontrar Carlos"
-    print(f"✓ PASSOU - Pesquisa 'Carlos' retornou {len(resultado)} resultado(s)")
+    def test_05_listar_todos_clientes(self):
+        """TC-CLI-005: Listar todos os clientes"""
+        self.hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
+        self.hotel.cadastrar_cliente("João Santos", "Av B, 456", "31988882222")
+        self.hotel.cadastrar_cliente("Ana Costa", "Praca C, 789", "31977773333")
+        
+        todos = self.hotel.listar_clientes()
+        self.assertEqual(len(todos), 3, "Deve ter 3 clientes")
     
-    # TESTE 6: Validar estrutura conforme PDF
-    print("\n[TC-FUNC-006] Validando estrutura conforme PDF...")
-    assert hasattr(f1, 'codigo'), "Deve ter codigo"
-    assert hasattr(f1, 'nome'), "Deve ter nome"
-    assert hasattr(f1, 'telefone'), "Deve ter telefone"
-    assert hasattr(f1, 'cargo'), "Deve ter cargo"
-    assert hasattr(f1, 'salario'), "Deve ter salario"
-    print("✓ PASSOU - Campos obrigatorios: codigo, nome, telefone, cargo, salario")
-    
-    tempo = time.time() - inicio
-    print("\n" + "=" * 70)
-    print(f"✓✓✓ TODOS OS TESTES DE FUNCIONARIOS PASSARAM! (6/6) [{tempo:.3f}s]")
-    print("=" * 70)
+    def test_06_validar_estrutura_cliente(self):
+        """TC-CLI-006: Validar estrutura do cliente conforme PDF"""
+        c1 = self.hotel.cadastrar_cliente("Maria Silva", "Rua A, 123", "31999991111")
+        
+        self.assertTrue(hasattr(c1, 'codigo'), "Cliente deve ter codigo")
+        self.assertTrue(hasattr(c1, 'nome'), "Cliente deve ter nome")
+        self.assertTrue(hasattr(c1, 'endereco'), "Cliente deve ter endereco")
+        self.assertTrue(hasattr(c1, 'telefone'), "Cliente deve ter telefone")
 
-def teste_quartos():
-    """Testa TODAS as funcionalidades relacionadas a quartos"""
-    print("\n" + "=" * 70)
-    print("TESTANDO QUARTOS - BATERIA COMPLETA (8 testes)")
-    print("=" * 70)
-    
-    inicio = time.time()
-    hotel = Hotel("Hotel Teste")
-    
-    # TESTE 1: Adicionar quartos com sucesso
-    print("\n[TC-QTO-001] Adicionando quartos...")
-    assert hotel.adicionar_quarto(101, "Simples", 1, 150.00) == True
-    assert hotel.adicionar_quarto(102, "Duplo", 2, 250.00) == True
-    assert hotel.adicionar_quarto(201, "Suíte", 4, 500.00) == True
-    assert hotel.adicionar_quarto(202, "Simples", 1, 150.00) == True
-    print(f"✓ PASSOU - 4 quartos cadastrados (101, 102, 201, 202)")
-    
-    # TESTE 2: Prevenir numero duplicado
-    print("\n[TC-QTO-002] Testando prevencao de numero duplicado...")
-    assert hotel.adicionar_quarto(101, "Simples", 1, 150.00) == False
-    print("✓ PASSOU - Bloqueou cadastro duplicado do quarto 101")
-    
-    # TESTE 3: Buscar quarto por numero
-    print("\n[TC-QTO-003] Buscando quarto por numero...")
-    quarto = hotel.buscar_quarto_por_numero(101)
-    assert quarto is not None, "Deve encontrar quarto"
-    assert quarto.numero == 101, "Numero deve corresponder"
-    print(f"✓ PASSOU - Quarto 101 encontrado (capacidade: {quarto.quantidade_hospedes})")
-    
-    # TESTE 4: Validar estrutura conforme PDF
-    print("\n[TC-QTO-004] Validando estrutura do quarto conforme PDF...")
-    q = hotel.quartos[0]
-    assert hasattr(q, 'numero'), "Deve ter numero"
-    assert hasattr(q, 'quantidade_hospedes'), "Deve ter quantidade_hospedes"
-    assert hasattr(q, 'preco_diaria'), "Deve ter preco_diaria"
-    assert hasattr(q, 'status'), "Deve ter status"
-    print("✓ PASSOU - Campos obrigatorios: numero, quantidade_hospedes, valor diaria, status")
-    
-    # TESTE 5: Validar status inicial (desocupado)
-    print("\n[TC-QTO-005] Validando status inicial...")
-    assert q.status == "desocupado", "Status inicial deve ser desocupado"
-    print("✓ PASSOU - Status inicial 'desocupado' (conforme PDF)")
-    
-    # TESTE 6: Validar possiveis status conforme PDF
-    print("\n[TC-QTO-006] Testando mudanca de status (ocupado/desocupado)...")
-    assert q.marcar_ocupado() == True, "Deve marcar como ocupado"
-    assert q.status == "ocupado", "Status deve ser ocupado"
-    q.marcar_desocupado()
-    assert q.status == "desocupado", "Status deve voltar a desocupado"
-    print("✓ PASSOU - Apenas 2 status conforme PDF: ocupado/desocupado")
-    
-    # TESTE 7: Listar quartos disponiveis (desocupados)
-    print("\n[TC-QTO-007] Listando quartos disponiveis...")
-    disponiveis = hotel.listar_quartos_disponiveis()
-    assert len(disponiveis) == 4, "Todos devem estar disponiveis"
-    print(f"✓ PASSOU - {len(disponiveis)} quartos com status 'desocupado'")
-    
-    # TESTE 8: Testar quantidade_hospedes (campo do PDF)
-    print("\n[TC-QTO-008] Validando campo quantidade_hospedes...")
-    q = hotel.quartos[0]
-    assert q.quantidade_hospedes == 1, "Quantidade deve ser 1"
-    assert isinstance(q.quantidade_hospedes, int), "Deve ser inteiro"
-    print(f"✓ PASSOU - Campo quantidade_hospedes = {q.quantidade_hospedes} (tipo: int)")
-    
-    tempo = time.time() - inicio
-    print("\n" + "=" * 70)
-    print(f"✓✓✓ TODOS OS TESTES DE QUARTOS PASSARAM! (8/8) [{tempo:.3f}s]")
-    print("=" * 70)
 
-def teste_estadias():
-    """Testa TODAS as funcionalidades relacionadas a estadias"""
-    print("\n" + "=" * 70)
-    print("TESTANDO ESTADIAS - BATERIA COMPLETA (10 testes)")
-    print("=" * 70)
+class TestFuncionarios(unittest.TestCase):
+    """Testa TODAS as funcionalidades relacionadas a funcionarios (6 testes)"""
     
-    inicio = time.time()
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
     
-    hotel = Hotel("Hotel Teste")
+    def test_01_cadastrar_funcionarios_codigo_auto_gerado(self):
+        """TC-FUNC-001: Cadastrar funcionarios com codigo auto-gerado"""
+        f1 = self.hotel.cadastrar_funcionario("Ana Costa", "31977773333", "Recepcionista", 2500.00)
+        f2 = self.hotel.cadastrar_funcionario("Carlos Souza", "31966664444", "Gerente", 5000.00)
+        f3 = self.hotel.cadastrar_funcionario("Maria Lima", "31955555555", "Auxiliar de limpeza", 1800.00)
+        f4 = self.hotel.cadastrar_funcionario("Jose Silva", "31944446666", "Garçom", 2000.00)
+        
+        self.assertEqual(f1.codigo, 1, "Primeiro funcionario codigo 1")
+        self.assertEqual(f2.codigo, 2, "Segundo funcionario codigo 2")
+        self.assertEqual(f3.codigo, 3, "Terceiro funcionario codigo 3")
+        self.assertEqual(f4.codigo, 4, "Quarto funcionario codigo 4")
     
-    # Setup
-    cliente1 = hotel.cadastrar_cliente("Teste Cliente", "End Teste", "31999999999")
-    cliente2 = hotel.cadastrar_cliente("Outro Cliente", "End 2", "31988888888")
-    hotel.adicionar_quarto(101, "Simples", 1, 150.00)
-    hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
-    hotel.adicionar_quarto(201, "Suíte", 4, 500.00)
-    hotel.adicionar_quarto(202, "Simples", 1, 150.00)
+    def test_02_validar_unicidade_codigos_funcionarios(self):
+        """TC-FUNC-002: Validar unicidade de codigos"""
+        self.hotel.cadastrar_funcionario("Ana Costa", "31977773333", "Recepcionista", 2500.00)
+        self.hotel.cadastrar_funcionario("Carlos Souza", "31966664444", "Gerente", 5000.00)
+        
+        codigos = [f.codigo for f in self.hotel.funcionarios]
+        self.assertEqual(len(codigos), len(set(codigos)), "Nao deve haver codigos duplicados")
     
-    # TESTE 1: Cadastrar estadia COM BUSCA AUTOMATICA (conforme PDF item 4)
-    print("\n1. Cadastrando estadia com busca automatica de quarto...")
-    entrada = date.today() + timedelta(days=1)
-    saida = entrada + timedelta(days=2)
-    estadia = hotel.cadastrar_estadia(cliente1.codigo, 1, entrada, saida)
-    assert estadia is not None, "Deve criar estadia"
-    assert estadia.quantidade_diarias == 2, "Deve ter 2 diarias"
-    assert estadia.quarto.quantidade_hospedes >= 1, "Quarto deve ter capacidade suficiente"
-    print(f"✓ OK - estadia criada com quarto alocado automaticamente: {estadia.quarto.numero}")
+    def test_03_buscar_funcionario_por_codigo(self):
+        """TC-FUNC-003: Buscar funcionario por codigo"""
+        f1 = self.hotel.cadastrar_funcionario("Ana Costa", "31977773333", "Recepcionista", 2500.00)
+        
+        func = self.hotel.buscar_funcionario_por_codigo(f1.codigo)
+        self.assertIsNotNone(func, "Deve encontrar")
+        self.assertEqual(func.cargo, "Recepcionista", "Cargo deve corresponder")
+        self.assertEqual(func.salario, 2500.00, "Salario deve corresponder")
     
-    # TESTE 2: Validar estrutura da estadia conforme PDF
-    print("\n2. Validando estrutura da estadia conforme PDF...")
-    assert hasattr(estadia, 'codigo'), "Deve ter codigo"
-    assert hasattr(estadia, 'data_entrada'), "Deve ter data_entrada"
-    assert hasattr(estadia, 'data_saida'), "Deve ter data_saida"
-    assert hasattr(estadia, 'quantidade_diarias'), "Deve ter quantidade_diarias"
-    assert hasattr(estadia, 'codigo_cliente'), "Deve ter codigo_cliente"
-    assert hasattr(estadia, 'quarto'), "Deve ter referencia ao quarto"
-    print("✓ OK - estrutura conforme PDF completa")
+    def test_04_buscar_funcionario_inexistente(self):
+        """TC-FUNC-004: Buscar funcionario inexistente"""
+        func = self.hotel.buscar_funcionario_por_codigo(999)
+        self.assertIsNone(func, "Deve retornar None")
     
-    # TESTE 3: Validar calculo de diarias
-    print("\n3. Validando calculo de diarias...")
-    assert estadia.quantidade_diarias == (saida - entrada).days, "Calculo deve estar correto"
-    print(f"✓ OK - {estadia.quantidade_diarias} diarias calculadas corretamente")
+    def test_05_pesquisar_por_nome(self):
+        """TC-FUNC-005: Pesquisar funcionario por nome"""
+        self.hotel.cadastrar_funcionario("Carlos Souza", "31966664444", "Gerente", 5000.00)
+        
+        resultado = self.hotel.pesquisar_funcionario("Carlos")
+        self.assertGreaterEqual(len(resultado), 1, "Deve encontrar Carlos")
     
-    # TESTE 4: Validar calculo de valor total
-    print("\n4. Validando calculo de valor total...")
-    valor_esperado = estadia.quantidade_diarias * estadia.quarto.preco_diaria
-    assert estadia.valor_total == valor_esperado, "Valor deve estar correto"
-    print(f"✓ OK - valor R${estadia.valor_total:.2f} calculado corretamente")
-    
-    # TESTE 5: Validar que cliente deve existir
-    print("\n5. Testando validacao: cliente deve existir...")
-    estadia_invalida = hotel.cadastrar_estadia(999, 1, entrada, saida)
-    assert estadia_invalida is None, "Nao deve criar estadia com cliente inexistente"
-    print("✓ OK - nao permite estadia sem cliente cadastrado")
-    
-    # TESTE 6: Validar que quarto deve estar desocupado
-    print("\n6. Testando validacao: quarto deve estar desocupado...")
-    entrada2 = date.today() + timedelta(days=1)
-    saida2 = entrada2 + timedelta(days=2)
-    # Tenta criar outra estadia no mesmo quarto e periodo
-    estadia2 = hotel.fazer_estadia(cliente2.codigo, estadia.quarto.numero, entrada2, saida2)
-    assert estadia2 is None, "Nao deve permitir conflito de datas"
-    print("✓ OK - nao permite conflito de periodo (quarto ja reservado)")
-    
-    # TESTE 7: Testar cancelamento de estadia
-    print("\n7. Testando cancelamento de estadia...")
-    assert hotel.cancelar_estadia(estadia.codigo) == True, "Deve cancelar"
-    assert estadia.status == "Cancelada", "Status deve ser Cancelada"
-    assert estadia.quarto.status == "desocupado", "Quarto deve voltar a desocupado"
-    print("✓ OK - cancelamento libera quarto (status = desocupado)")
-    
-    # TESTE 8: Testar check-in
-    print("\n8. Testando check-in...")
-    entrada3 = date.today() - timedelta(days=1)  # ontem (ja passou)
-    saida3 = entrada3 + timedelta(days=3)        # daqui 2 dias
-    estadia3 = hotel.fazer_estadia(cliente2.codigo, 102, entrada3, saida3)
-    assert hotel.fazer_checkin(estadia3.codigo) == True, "Check-in deve funcionar"
-    assert estadia3.quarto.status == "ocupado", "Quarto deve ficar ocupado"
-    print("✓ OK - check-in marca quarto como ocupado")
-    
-    # TESTE 9: Testar checkout (funcao 5 do PDF) com validacao de data
-    print("\n9. Testando checkout conforme item 5 do PDF...")
-    sucesso, resultado = hotel.fazer_checkout(estadia3.codigo)
-    assert sucesso == True, f"Checkout deve funcionar: {resultado}"
-    assert estadia3.status == "Concluida", "Status deve ser Concluida"
-    assert estadia3.quarto.status == "desocupado", "Quarto deve voltar a desocupado"
-    print(f"✓ OK - checkout: status=Concluida, quarto=desocupado, valor=R${resultado:.2f}")
-    
-    # TESTE 10: Testar busca de quarto automatica com quantidade_hospedes
-    print("\n10. Testando busca automatica por quantidade_hospedes...")
-    entrada4 = date.today() + timedelta(days=20)
-    saida4 = entrada4 + timedelta(days=1)
-    estadia4 = hotel.cadastrar_estadia(cliente1.codigo, 4, entrada4, saida4)  # 4 hospedes
-    assert estadia4 is not None, "Deve encontrar quarto"
-    assert estadia4.quarto.quantidade_hospedes >= 4, "Quarto deve ter capacidade >= 4"
-    print(f"✓ OK - encontrou quarto {estadia4.quarto.numero} com capacidade {estadia4.quarto.quantidade_hospedes}")
-    
-    print("\n" + "=" * 60)
-    print("✓✓✓ TODOS OS TESTES DE ESTADIAS PASSARAM! (10/10)")
-    print("=" * 60)
+    def test_06_validar_estrutura_conforme_pdf(self):
+        """TC-FUNC-006: Validar estrutura conforme PDF"""
+        f1 = self.hotel.cadastrar_funcionario("Ana Costa", "31977773333", "Recepcionista", 2500.00)
+        
+        self.assertTrue(hasattr(f1, 'codigo'), "Deve ter codigo")
+        self.assertTrue(hasattr(f1, 'nome'), "Deve ter nome")
+        self.assertTrue(hasattr(f1, 'telefone'), "Deve ter telefone")
+        self.assertTrue(hasattr(f1, 'cargo'), "Deve ter cargo")
+        self.assertTrue(hasattr(f1, 'salario'), "Deve ter salario")
 
-def teste_pontos_fidelidade():
-    """Testa funcao 8 do PDF: pontos de fidelidade"""
-    print("\n" + "=" * 60)
-    print("TESTANDO PONTOS DE FIDELIDADE (Item 8 do PDF)")
-    print("=" * 60)
-    
-    hotel = Hotel("Hotel Teste")
-    
-    # Setup
-    cliente = hotel.cadastrar_cliente("Cliente Fiel", "End", "31999999999")
-    hotel.adicionar_quarto(101, "Simples", 1, 150.00)
-    hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
-    hotel.adicionar_quarto(103, "Suite", 4, 500.00)
-    
-    # TESTE 1: Cliente sem estadias = 0 pontos
-    print("\n1. Cliente sem estadias...")
-    estadias = hotel.listar_estadias_por_cliente(cliente.codigo)
-    pontos = cliente.calcular_pontos_fidelidade(estadias)
-    assert pontos == 0, "Cliente sem estadias deve ter 0 pontos"
-    print("✓ OK - 0 pontos para cliente sem estadias")
-    
-    # TESTE 2: Cliente com 1 estadia
-    print("\n2. Cliente com 1 estadia (3 diarias)...")
-    entrada1 = date.today() + timedelta(days=1)
-    saida1 = entrada1 + timedelta(days=3)  # 3 diarias
-    estadia1 = hotel.fazer_estadia(cliente.codigo, 101, entrada1, saida1)
-    estadias = hotel.listar_estadias_por_cliente(cliente.codigo)
-    pontos = cliente.calcular_pontos_fidelidade(estadias)
-    assert pontos == 30, "3 diarias x 10 = 30 pontos"
-    print(f"✓ OK - {pontos} pontos (3 diarias x 10)")
-    
-    # TESTE 3: Cliente com multiplas estadias (conforme menciona PDF)
-    print("\n3. Cliente com multiplas estadias...")
-    entrada2 = date.today() + timedelta(days=10)
-    saida2 = entrada2 + timedelta(days=5)  # 5 diarias
-    estadia2 = hotel.fazer_estadia(cliente.codigo, 102, entrada2, saida2)
-    
-    entrada3 = date.today() + timedelta(days=20)
-    saida3 = entrada3 + timedelta(days=2)  # 2 diarias
-    estadia3 = hotel.fazer_estadia(cliente.codigo, 103, entrada3, saida3)
-    
-    estadias = hotel.listar_estadias_por_cliente(cliente.codigo)
-    pontos = cliente.calcular_pontos_fidelidade(estadias)
-    assert pontos == 100, "10 diarias totais x 10 = 100 pontos"
-    print(f"✓ OK - {pontos} pontos (3+5+2 = 10 diarias x 10)")
-    
-    # TESTE 4: Validar calculo correto (10 pontos por diaria)
-    print("\n4. Validando regra: 10 pontos por diaria...")
-    total_diarias = sum(e.quantidade_diarias for e in estadias if e.codigo_cliente == cliente.codigo)
-    pontos_esperados = total_diarias * 10
-    assert pontos == pontos_esperados, "Deve ser 10 pontos por diaria"
-    print(f"✓ OK - regra validada: {total_diarias} diarias x 10 = {pontos} pontos")
-    
-    print("\n" + "=" * 60)
-    print("✓✓✓ TODOS OS TESTES DE PONTOS PASSARAM! (4/4)")
-    print("=" * 60)
 
-def teste_pesquisas():
-    """Testa funcao 6 e 7 do PDF: pesquisas"""
-    print("\n" + "=" * 60)
-    print("TESTANDO PESQUISAS (Item 6 e 7 do PDF)")
-    print("=" * 60)
+class TestQuartos(unittest.TestCase):
+    """Testa TODAS as funcionalidades relacionadas a quartos (8 testes)"""
     
-    hotel = Hotel("Hotel Teste")
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
     
-    # Setup
-    c1 = hotel.cadastrar_cliente("Maria Silva", "Rua A", "31999991111")
-    c2 = hotel.cadastrar_cliente("João Silva", "Rua B", "31988882222")
-    c3 = hotel.cadastrar_cliente("Ana Costa", "Rua C", "31977773333")
+    def test_01_adicionar_quartos(self):
+        """TC-QTO-001: Adicionar quartos com sucesso"""
+        self.assertTrue(self.hotel.adicionar_quarto(101, "Simples", 1, 150.00))
+        self.assertTrue(self.hotel.adicionar_quarto(102, "Duplo", 2, 250.00))
+        self.assertTrue(self.hotel.adicionar_quarto(201, "Suíte", 4, 500.00))
+        self.assertTrue(self.hotel.adicionar_quarto(202, "Simples", 1, 150.00))
+        self.assertEqual(len(self.hotel.quartos), 4, "Deve ter 4 quartos")
     
-    f1 = hotel.cadastrar_funcionario("Carlos Santos", "31966664444", "Gerente", 5000.00)
-    f2 = hotel.cadastrar_funcionario("Julia Lima", "31955555555", "Recepcionista", 2500.00)
+    def test_02_prevenir_numero_duplicado(self):
+        """TC-QTO-002: Prevenir numero duplicado"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        self.assertFalse(self.hotel.adicionar_quarto(101, "Simples", 1, 150.00))
     
-    hotel.adicionar_quarto(101, "Simples", 1, 150.00)
-    hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
+    def test_03_buscar_quarto_por_numero(self):
+        """TC-QTO-003: Buscar quarto por numero"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        
+        quarto = self.hotel.buscar_quarto_por_numero(101)
+        self.assertIsNotNone(quarto, "Deve encontrar quarto")
+        self.assertEqual(quarto.numero, 101, "Numero deve corresponder")
     
-    # TESTE 1: Pesquisar cliente por nome
-    print("\n1. Pesquisando cliente por nome...")
-    resultado = hotel.pesquisar_cliente("Maria")
-    assert len(resultado) == 1, "Deve encontrar Maria"
-    assert resultado[0].nome == "Maria Silva", "Deve ser Maria Silva"
-    print("✓ OK - pesquisa por nome funcionou")
+    def test_04_validar_estrutura_conforme_pdf(self):
+        """TC-QTO-004: Validar estrutura do quarto conforme PDF"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        q = self.hotel.quartos[0]
+        
+        self.assertTrue(hasattr(q, 'numero'), "Deve ter numero")
+        self.assertTrue(hasattr(q, 'quantidade_hospedes'), "Deve ter quantidade_hospedes")
+        self.assertTrue(hasattr(q, 'preco_diaria'), "Deve ter preco_diaria")
+        self.assertTrue(hasattr(q, 'status'), "Deve ter status")
     
-    # TESTE 2: Pesquisar cliente por codigo
-    print("\n2. Pesquisando cliente por codigo...")
-    resultado = hotel.pesquisar_cliente(str(c2.codigo))
-    assert len(resultado) == 1, "Deve encontrar 1"
-    assert resultado[0].codigo == c2.codigo, "Codigo deve corresponder"
-    print("✓ OK - pesquisa por codigo funcionou")
+    def test_05_validar_status_inicial(self):
+        """TC-QTO-005: Validar status inicial"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        q = self.hotel.quartos[0]
+        self.assertEqual(q.status, "Disponível", "Status inicial deve ser Disponível")
     
-    # TESTE 3: Pesquisar cliente por nome parcial
-    print("\n3. Pesquisando cliente por nome parcial...")
-    resultado = hotel.pesquisar_cliente("Silva")  # deve encontrar Maria e Joao
-    assert len(resultado) == 2, "Deve encontrar 2 (Maria e Joao Silva)"
-    print("✓ OK - pesquisa parcial encontrou multiplos resultados")
+    def test_06_testar_mudanca_status(self):
+        """TC-QTO-006: Testar mudanca de status"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        q = self.hotel.quartos[0]
+        
+        self.assertTrue(q.marcar_ocupado(), "Deve marcar como ocupado")
+        self.assertEqual(q.status, "Ocupado", "Status deve ser Ocupado")
+        
+        q.marcar_desocupado()
+        self.assertEqual(q.status, "Disponível", "Status deve voltar a Disponível")
     
-    # TESTE 4: Pesquisar funcionario por nome
-    print("\n4. Pesquisando funcionario por nome...")
-    resultado = hotel.pesquisar_funcionario("Carlos")
-    assert len(resultado) == 1, "Deve encontrar Carlos"
-    assert resultado[0].nome == "Carlos Santos", "Deve ser Carlos Santos"
-    print("✓ OK - pesquisa funcionario por nome")
+    def test_07_listar_quartos_disponiveis(self):
+        """TC-QTO-007: Listar quartos disponiveis"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        self.hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
+        self.hotel.adicionar_quarto(201, "Suíte", 4, 500.00)
+        self.hotel.adicionar_quarto(202, "Simples", 1, 150.00)
+        
+        disponiveis = self.hotel.listar_quartos_disponiveis()
+        self.assertEqual(len(disponiveis), 4, "Todos devem estar disponiveis")
     
-    # TESTE 5: Pesquisar funcionario por codigo
-    print("\n5. Pesquisando funcionario por codigo...")
-    resultado = hotel.pesquisar_funcionario(str(f1.codigo))
-    assert len(resultado) == 1, "Deve encontrar 1"
-    assert resultado[0].codigo == f1.codigo, "Codigo deve corresponder"
-    print("✓ OK - pesquisa funcionario por codigo")
-    
-    # TESTE 6: Listar estadias de cliente (item 7 do PDF)
-    print("\n6. Listando estadias de um cliente (item 7 do PDF)...")
-    entrada = date.today() + timedelta(days=1)
-    saida = entrada + timedelta(days=2)
-    estadia1 = hotel.fazer_estadia(c1.codigo, 101, entrada, saida)
-    
-    entrada2 = date.today() + timedelta(days=10)
-    saida2 = entrada2 + timedelta(days=3)
-    estadia2 = hotel.fazer_estadia(c1.codigo, 102, entrada2, saida2)
-    
-    estadias_maria = hotel.listar_estadias_por_cliente(c1.codigo)
-    assert len(estadias_maria) == 2, "Maria deve ter 2 estadias"
-    assert all(e.codigo_cliente == c1.codigo for e in estadias_maria), "Todas devem ser da Maria"
-    print(f"✓ OK - listou {len(estadias_maria)} estadias da cliente Maria")
-    
-    print("\n" + "=" * 60)
-    print("✓✓✓ TODOS OS TESTES DE PESQUISAS PASSARAM! (6/6)")
-    print("=" * 60)
+    def test_08_testar_quantidade_hospedes(self):
+        """TC-QTO-008: Validar campo quantidade_hospedes"""
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        q = self.hotel.quartos[0]
+        
+        self.assertEqual(q.quantidade_hospedes, 1, "Quantidade deve ser 1")
+        self.assertIsInstance(q.quantidade_hospedes, int, "Deve ser inteiro")
 
-def teste_relatorios():
-    """Testa funcionalidades de relatorios"""
-    print("\n" + "=" * 60)
-    print("TESTANDO RELATORIOS")
-    print("=" * 60)
-    
-    hotel = Hotel("Hotel Teste")
-    
-    # Setup
-    cliente = hotel.cadastrar_cliente("Teste", "End", "31999999999")
-    hotel.adicionar_quarto(101, "Simples", 1, 150.00)
-    hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
-    hotel.adicionar_quarto(103, "Suite", 4, 500.00)
-    
-    entrada = date.today() + timedelta(days=1)
-    saida = entrada + timedelta(days=2)
-    estadia = hotel.fazer_estadia(cliente.codigo, 101, entrada, saida)
-    hotel.fazer_checkin(estadia.codigo)
-    
-    # TESTE 1: Relatorio de ocupacao
-    print("\n1. Testando relatorio de ocupacao...")
-    rel = hotel.relatorio_ocupacao()
-    assert rel['total_quartos'] == 3, "Total deve ser 3"
-    assert rel['quartos_ocupados'] == 1, "Ocupados deve ser 1"
-    taxa_esperada = (1 / 3) * 100
-    assert abs(rel['taxa_ocupacao'] - taxa_esperada) < 0.01, "Taxa deve estar correta"
-    print(f"✓ OK - Ocupacao: {rel['taxa_ocupacao']:.2f}% (1/3 quartos)")
-    
-    # TESTE 2: Relatorio de receita
-    print("\n2. Testando relatorio de receita...")
-    rel = hotel.relatorio_receita()
-    assert rel['receita_total'] == 300.00, "Receita deve ser 300"
-    assert rel['receita_pendente'] == 300.00, "Pendente deve ser 300"
-    print(f"✓ OK - Receita total: R${rel['receita_total']:.2f}")
-    
-    print("\n" + "=" * 60)
-    print("✓✓✓ TODOS OS TESTES DE RELATORIOS PASSARAM! (2/2)")
-    print("=" * 60)
 
-def teste_persistencia():
-    """Testa salvamento e carregamento de dados"""
-    print("\n" + "=" * 60)
-    print("TESTANDO PERSISTENCIA DE DADOS")
-    print("=" * 60)
+class TestEstadias(unittest.TestCase):
+    """Testa TODAS as funcionalidades relacionadas a estadias (10 testes)"""
     
-    # TESTE 1: Salvar dados
-    print("\n1. Salvando dados completos...")
-    hotel1 = Hotel("Hotel Teste")
-    cliente = hotel1.cadastrar_cliente("Maria", "Rua X", "31999999999")
-    hotel1.cadastrar_funcionario("Ana", "31988888888", "Recepcionista", 2500.00)
-    hotel1.adicionar_quarto(101, "Simples", 1, 150.00)
-    entrada = date.today() + timedelta(days=1)
-    saida = entrada + timedelta(days=2)
-    hotel1.fazer_estadia(cliente.codigo, 101, entrada, saida)
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
+        self.cliente1 = self.hotel.cadastrar_cliente("Teste Cliente", "End Teste", "31999999999")
+        self.cliente2 = self.hotel.cadastrar_cliente("Outro Cliente", "End 2", "31988888888")
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        self.hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
+        self.hotel.adicionar_quarto(201, "Suíte", 4, 500.00)
+        self.hotel.adicionar_quarto(202, "Simples", 1, 150.00)
     
-    assert hotel1.salvar_dados('data/teste_hotel.json') == True
-    print("✓ OK - dados salvos em arquivo")
+    def test_01_cadastrar_estadia_com_busca_automatica(self):
+        """TC-EST-001: Cadastrar estadia COM BUSCA AUTOMATICA"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.cadastrar_estadia(self.cliente1.codigo, 1, entrada, saida)
+        
+        self.assertIsNotNone(estadia, "Deve criar estadia")
+        self.assertEqual(estadia.quantidade_diarias, 2, "Deve ter 2 diarias")
+        self.assertGreaterEqual(estadia.quarto.quantidade_hospedes, 1, "Quarto deve ter capacidade suficiente")
     
-    # TESTE 2: Carregar dados
-    print("\n2. Carregando dados...")
-    hotel2 = Hotel("Vazio")
-    assert hotel2.carregar_dados('data/teste_hotel.json') == True
-    print("✓ OK - dados carregados")
+    def test_02_validar_estrutura_estadia_conforme_pdf(self):
+        """TC-EST-002: Validar estrutura da estadia conforme PDF"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.cadastrar_estadia(self.cliente1.codigo, 1, entrada, saida)
+        
+        self.assertTrue(hasattr(estadia, 'codigo'), "Deve ter codigo")
+        self.assertTrue(hasattr(estadia, 'data_entrada'), "Deve ter data_entrada")
+        self.assertTrue(hasattr(estadia, 'data_saida'), "Deve ter data_saida")
+        self.assertTrue(hasattr(estadia, 'quantidade_diarias'), "Deve ter quantidade_diarias")
+        self.assertTrue(hasattr(estadia, 'codigo_cliente'), "Deve ter codigo_cliente")
+        self.assertTrue(hasattr(estadia, 'quarto'), "Deve ter referencia ao quarto")
     
-    # TESTE 3: Verificar integridade
-    print("\n3. Verificando integridade dos dados...")
-    assert len(hotel2.clientes) == 1, "Deve ter 1 cliente"
-    assert len(hotel2.funcionarios) == 1, "Deve ter 1 funcionario"
-    assert len(hotel2.quartos) == 1, "Deve ter 1 quarto"
-    assert len(hotel2.estadias) == 1, "Deve ter 1 estadia"
-    assert hotel2.clientes[0].nome == "Maria", "Nome deve ser preservado"
-    assert hotel2.quartos[0].quantidade_hospedes == 1, "Quantidade_hospedes preservada"
-    assert hotel2.quartos[0].status == "desocupado", "Status preservado"
-    print("✓ OK - todos os dados integros e com campos corretos do PDF")
+    def test_03_validar_calculo_diarias(self):
+        """TC-EST-003: Validar calculo de diarias"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.cadastrar_estadia(self.cliente1.codigo, 1, entrada, saida)
+        
+        self.assertEqual(estadia.quantidade_diarias, (saida - entrada).days, "Calculo deve estar correto")
     
-    # Limpa arquivo de teste
-    import os
-    if os.path.exists('data/teste_hotel.json'):
-        os.remove('data/teste_hotel.json')
+    def test_04_validar_calculo_valor_total(self):
+        """TC-EST-004: Validar calculo de valor total"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.cadastrar_estadia(self.cliente1.codigo, 1, entrada, saida)
+        
+        valor_esperado = estadia.quantidade_diarias * estadia.quarto.preco_diaria
+        self.assertEqual(estadia.valor_total, valor_esperado, "Valor deve estar correto")
     
-    print("\n" + "=" * 60)
-    print("✓✓✓ TODOS OS TESTES DE PERSISTENCIA PASSARAM! (3/3)")
-    print("=" * 60)
+    def test_05_validar_cliente_deve_existir(self):
+        """TC-EST-005: Cliente deve existir"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia_invalida = self.hotel.cadastrar_estadia(999, 1, entrada, saida)
+        
+        self.assertIsNone(estadia_invalida, "Nao deve criar estadia com cliente inexistente")
+    
+    def test_06_validar_quarto_disponivel(self):
+        """TC-EST-006: Quarto deve estar disponivel"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.cadastrar_estadia(self.cliente1.codigo, 1, entrada, saida)
+        
+        entrada2 = date.today() + timedelta(days=1)
+        saida2 = entrada2 + timedelta(days=2)
+        estadia2 = self.hotel.fazer_estadia(self.cliente2.codigo, estadia.quarto.numero, entrada2, saida2)
+        
+        self.assertIsNone(estadia2, "Nao deve permitir conflito de datas")
+    
+    def test_07_testar_cancelamento_estadia(self):
+        """TC-EST-007: Testar cancelamento de estadia"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.cadastrar_estadia(self.cliente1.codigo, 1, entrada, saida)
+        
+        self.assertTrue(self.hotel.cancelar_estadia(estadia.codigo), "Deve cancelar")
+        self.assertEqual(estadia.status, "Cancelada", "Status deve ser Cancelada")
+        self.assertEqual(estadia.quarto.status, "Disponível", "Quarto deve voltar a Disponível")
+    
+    def test_08_testar_checkin(self):
+        """TC-EST-008: Testar check-in"""
+        entrada3 = date.today() - timedelta(days=1)
+        saida3 = entrada3 + timedelta(days=3)
+        estadia3 = self.hotel.fazer_estadia(self.cliente2.codigo, 102, entrada3, saida3)
+        
+        self.assertTrue(self.hotel.fazer_checkin(estadia3.codigo), "Check-in deve funcionar")
+        self.assertEqual(estadia3.quarto.status, "Ocupado", "Quarto deve ficar Ocupado")
+    
+    def test_09_testar_checkout(self):
+        """TC-EST-009: Testar checkout conforme PDF"""
+        entrada = date.today() - timedelta(days=1)
+        saida = entrada + timedelta(days=3)
+        estadia = self.hotel.fazer_estadia(self.cliente2.codigo, 102, entrada, saida)
+        self.hotel.fazer_checkin(estadia.codigo)
+        
+        sucesso, resultado = self.hotel.fazer_checkout(estadia.codigo)
+        self.assertTrue(sucesso, f"Checkout deve funcionar: {resultado}")
+        self.assertEqual(estadia.status, "Concluida", "Status deve ser Concluida")
+        self.assertEqual(estadia.quarto.status, "Disponível", "Quarto deve voltar a Disponível")
+    
+    def test_10_busca_automatica_por_quantidade_hospedes(self):
+        """TC-EST-010: Busca automatica por quantidade_hospedes"""
+        entrada4 = date.today() + timedelta(days=20)
+        saida4 = entrada4 + timedelta(days=1)
+        estadia4 = self.hotel.cadastrar_estadia(self.cliente1.codigo, 4, entrada4, saida4)
+        
+        self.assertIsNotNone(estadia4, "Deve encontrar quarto")
+        self.assertGreaterEqual(estadia4.quarto.quantidade_hospedes, 4, "Quarto deve ter capacidade >= 4")
 
-def teste_validacoes_restricoes():
-    """Testa TODAS as validacoes e restricoes mencionadas no PDF"""
-    print("\n" + "=" * 60)
-    print("TESTANDO VALIDACOES E RESTRICOES DO PDF")
-    print("=" * 60)
-    
-    hotel = Hotel("Hotel Teste")
-    cliente = hotel.cadastrar_cliente("Cliente Teste", "End", "31999999999")
-    hotel.adicionar_quarto(101, "Simples", 1, 150.00)
-    
-    # TESTE 1: Cliente deve existir para criar estadia
-    print("\n1. Validando: cliente deve existir para criar estadia...")
-    entrada = date.today() + timedelta(days=1)
-    saida = entrada + timedelta(days=2)
-    estadia_invalida = hotel.cadastrar_estadia(999, 1, entrada, saida)
-    assert estadia_invalida is None, "Nao deve criar estadia sem cliente"
-    print("✓ OK - nao permite estadia sem cliente cadastrado")
-    
-    # TESTE 2: Quarto deve existir para criar estadia (modo manual)
-    print("\n2. Validando: quarto deve existir...")
-    estadia_invalida = hotel.fazer_estadia(cliente.codigo, 999, entrada, saida)
-    assert estadia_invalida is None, "Nao deve criar estadia sem quarto"
-    print("✓ OK - nao permite estadia sem quarto cadastrado")
-    
-    # TESTE 3: Status do quarto: apenas ocupado e desocupado
-    print("\n3. Validando: status conforme PDF (ocupado/desocupado)...")
-    q = hotel.quartos[0]
-    assert q.status in ["ocupado", "desocupado"], "Status deve ser ocupado ou desocupado"
-    print("✓ OK - apenas 2 status possiveis conforme PDF")
-    
-    print("\n" + "=" * 60)
-    print("✓✓✓ TODOS OS TESTES DE VALIDACOES PASSARAM! (3/3)")
-    print("=" * 60)
 
-def main():
-    """Executa TODA a bateria de testes"""
-    print("\n" + "=" * 80)
-    print("  BATERIA COMPLETA DE TESTES DO SISTEMA")
-    print("  Validando conformidade com especificacao do PDF")
-    print("  Apropriado para primeiro periodo de AED")
-    print("=" * 80)
+class TestPontosFidelidade(unittest.TestCase):
+    """Testa funcao 8 do PDF: pontos de fidelidade (4 testes)"""
     
-    inicio_geral = time.time()
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
+        self.cliente = self.hotel.cadastrar_cliente("Cliente Fiel", "End", "31999999999")
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        self.hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
+        self.hotel.adicionar_quarto(103, "Suite", 4, 500.00)
     
-    teste_clientes()              # 6 testes
-    teste_funcionarios()          # 6 testes
-    teste_quartos()               # 8 testes
-    teste_estadias()              # 10 testes
-    teste_pontos_fidelidade()     # 4 testes
-    teste_pesquisas()             # 6 testes
-    teste_relatorios()            # 2 testes
-    teste_persistencia()          # 3 testes
-    teste_validacoes_restricoes() # 3 testes
+    def test_01_cliente_sem_estadias_zero_pontos(self):
+        """TC-PTS-001: Cliente sem estadias = 0 pontos"""
+        estadias = self.hotel.listar_estadias_por_cliente(self.cliente.codigo)
+        pontos = self.cliente.calcular_pontos_fidelidade(estadias)
+        self.assertEqual(pontos, 0, "Cliente sem estadias deve ter 0 pontos")
     
-    tempo_total = time.time() - inicio_geral
-    total_testes = 6 + 6 + 8 + 10 + 4 + 6 + 2 + 3 + 3
+    def test_02_cliente_com_uma_estadia(self):
+        """TC-PTS-002: Cliente com 1 estadia"""
+        entrada1 = date.today() + timedelta(days=1)
+        saida1 = entrada1 + timedelta(days=3)
+        self.hotel.fazer_estadia(self.cliente.codigo, 101, entrada1, saida1)
+        
+        estadias = self.hotel.listar_estadias_por_cliente(self.cliente.codigo)
+        pontos = self.cliente.calcular_pontos_fidelidade(estadias)
+        self.assertEqual(pontos, 30, "3 diarias x 10 = 30 pontos")
     
-    print("\n" + "=" * 80)
-    print(f"  ✓✓✓ SUCESSO TOTAL! {total_testes}/48 TESTES PASSARAM! ✓✓✓")
-    print(f"  Sistema 100% conforme especificacao PDF")
-    print(f"  Tempo total de execucao: {tempo_total:.3f}s")
-    print(f"  Media por teste: {(tempo_total/total_testes)*1000:.1f}ms")
-    print("=" * 80)
+    def test_03_cliente_com_multiplas_estadias(self):
+        """TC-PTS-003: Cliente com multiplas estadias"""
+        entrada1 = date.today() + timedelta(days=1)
+        saida1 = entrada1 + timedelta(days=3)
+        self.hotel.fazer_estadia(self.cliente.codigo, 101, entrada1, saida1)
+        
+        entrada2 = date.today() + timedelta(days=10)
+        saida2 = entrada2 + timedelta(days=5)
+        self.hotel.fazer_estadia(self.cliente.codigo, 102, entrada2, saida2)
+        
+        entrada3 = date.today() + timedelta(days=20)
+        saida3 = entrada3 + timedelta(days=2)
+        self.hotel.fazer_estadia(self.cliente.codigo, 103, entrada3, saida3)
+        
+        estadias = self.hotel.listar_estadias_por_cliente(self.cliente.codigo)
+        pontos = self.cliente.calcular_pontos_fidelidade(estadias)
+        self.assertEqual(pontos, 100, "10 diarias totais x 10 = 100 pontos")
+    
+    def test_04_validar_regra_10_pontos_por_diaria(self):
+        """TC-PTS-004: Validar regra: 10 pontos por diaria"""
+        entrada1 = date.today() + timedelta(days=1)
+        saida1 = entrada1 + timedelta(days=3)
+        self.hotel.fazer_estadia(self.cliente.codigo, 101, entrada1, saida1)
+        
+        entrada2 = date.today() + timedelta(days=10)
+        saida2 = entrada2 + timedelta(days=5)
+        self.hotel.fazer_estadia(self.cliente.codigo, 102, entrada2, saida2)
+        
+        estadias = self.hotel.listar_estadias_por_cliente(self.cliente.codigo)
+        pontos = self.cliente.calcular_pontos_fidelidade(estadias)
+        total_diarias = sum(e.quantidade_diarias for e in estadias if e.codigo_cliente == self.cliente.codigo)
+        pontos_esperados = total_diarias * 10
+        
+        self.assertEqual(pontos, pontos_esperados, "Deve ser 10 pontos por diaria")
 
-if __name__ == "__main__":
-    main()
+
+class TestPesquisas(unittest.TestCase):
+    """Testa funcao 6 e 7 do PDF: pesquisas (6 testes)"""
+    
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
+        self.c1 = self.hotel.cadastrar_cliente("Maria Silva", "Rua A", "31999991111")
+        self.c2 = self.hotel.cadastrar_cliente("João Silva", "Rua B", "31988882222")
+        self.c3 = self.hotel.cadastrar_cliente("Ana Costa", "Rua C", "31977773333")
+        self.f1 = self.hotel.cadastrar_funcionario("Carlos Santos", "31966664444", "Gerente", 5000.00)
+        self.f2 = self.hotel.cadastrar_funcionario("Julia Lima", "31955555555", "Recepcionista", 2500.00)
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        self.hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
+    
+    def test_01_pesquisar_cliente_por_nome(self):
+        """TC-PESQ-001: Pesquisar cliente por nome"""
+        resultado = self.hotel.pesquisar_cliente("Maria")
+        self.assertEqual(len(resultado), 1, "Deve encontrar Maria")
+        self.assertEqual(resultado[0].nome, "Maria Silva", "Deve ser Maria Silva")
+    
+    def test_02_pesquisar_cliente_por_codigo(self):
+        """TC-PESQ-002: Pesquisar cliente por codigo"""
+        resultado = self.hotel.pesquisar_cliente(str(self.c2.codigo))
+        self.assertEqual(len(resultado), 1, "Deve encontrar 1")
+        self.assertEqual(resultado[0].codigo, self.c2.codigo, "Codigo deve corresponder")
+    
+    def test_03_pesquisar_cliente_por_nome_parcial(self):
+        """TC-PESQ-003: Pesquisar cliente por nome parcial"""
+        resultado = self.hotel.pesquisar_cliente("Silva")
+        self.assertEqual(len(resultado), 2, "Deve encontrar 2 (Maria e Joao Silva)")
+    
+    def test_04_pesquisar_funcionario_por_nome(self):
+        """TC-PESQ-004: Pesquisar funcionario por nome"""
+        resultado = self.hotel.pesquisar_funcionario("Carlos")
+        self.assertEqual(len(resultado), 1, "Deve encontrar Carlos")
+        self.assertEqual(resultado[0].nome, "Carlos Santos", "Deve ser Carlos Santos")
+    
+    def test_05_pesquisar_funcionario_por_codigo(self):
+        """TC-PESQ-005: Pesquisar funcionario por codigo"""
+        resultado = self.hotel.pesquisar_funcionario(str(self.f1.codigo))
+        self.assertEqual(len(resultado), 1, "Deve encontrar 1")
+        self.assertEqual(resultado[0].codigo, self.f1.codigo, "Codigo deve corresponder")
+    
+    def test_06_listar_estadias_de_cliente(self):
+        """TC-PESQ-006: Listar estadias de um cliente"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        self.hotel.fazer_estadia(self.c1.codigo, 101, entrada, saida)
+        
+        entrada2 = date.today() + timedelta(days=10)
+        saida2 = entrada2 + timedelta(days=3)
+        self.hotel.fazer_estadia(self.c1.codigo, 102, entrada2, saida2)
+        
+        estadias_maria = self.hotel.listar_estadias_por_cliente(self.c1.codigo)
+        self.assertEqual(len(estadias_maria), 2, "Maria deve ter 2 estadias")
+        self.assertTrue(all(e.codigo_cliente == self.c1.codigo for e in estadias_maria), "Todas devem ser da Maria")
+
+
+class TestRelatorios(unittest.TestCase):
+    """Testa funcionalidades de relatorios (2 testes)"""
+    
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
+        self.cliente = self.hotel.cadastrar_cliente("Teste", "End", "31999999999")
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+        self.hotel.adicionar_quarto(102, "Duplo", 2, 250.00)
+        self.hotel.adicionar_quarto(103, "Suite", 4, 500.00)
+    
+    def test_01_relatorio_ocupacao(self):
+        """TC-REL-001: Relatorio de ocupacao"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.fazer_estadia(self.cliente.codigo, 101, entrada, saida)
+        self.hotel.fazer_checkin(estadia.codigo)
+        
+        rel = self.hotel.relatorio_ocupacao()
+        self.assertEqual(rel['total_quartos'], 3, "Total deve ser 3")
+        self.assertEqual(rel['quartos_ocupados'], 1, "Ocupados deve ser 1")
+        taxa_esperada = (1 / 3) * 100
+        self.assertAlmostEqual(rel['taxa_ocupacao'], taxa_esperada, places=2, msg="Taxa deve estar correta")
+    
+    def test_02_relatorio_receita(self):
+        """TC-REL-002: Relatorio de receita"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia = self.hotel.fazer_estadia(self.cliente.codigo, 101, entrada, saida)
+        self.hotel.fazer_checkin(estadia.codigo)
+        
+        rel = self.hotel.relatorio_receita()
+        self.assertEqual(rel['receita_total'], 300.00, "Receita deve ser 300")
+        self.assertEqual(rel['receita_pendente'], 300.00, "Pendente deve ser 300")
+
+
+class TestPersistencia(unittest.TestCase):
+    """Testa salvamento e carregamento de dados (3 testes)"""
+    
+    def test_01_salvar_dados(self):
+        """TC-PERS-001: Salvar dados"""
+        hotel1 = Hotel("Hotel Teste")
+        cliente = hotel1.cadastrar_cliente("Maria", "Rua X", "31999999999")
+        hotel1.cadastrar_funcionario("Ana", "31988888888", "Recepcionista", 2500.00)
+        hotel1.adicionar_quarto(101, "Simples", 1, 150.00)
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        hotel1.fazer_estadia(cliente.codigo, 101, entrada, saida)
+        
+        self.assertTrue(hotel1.salvar_dados('data/teste_hotel.json'))
+    
+    def test_02_carregar_dados(self):
+        """TC-PERS-002: Carregar dados"""
+        hotel1 = Hotel("Hotel Teste")
+        cliente = hotel1.cadastrar_cliente("Maria", "Rua X", "31999999999")
+        hotel1.cadastrar_funcionario("Ana", "31988888888", "Recepcionista", 2500.00)
+        hotel1.adicionar_quarto(101, "Simples", 1, 150.00)
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        hotel1.fazer_estadia(cliente.codigo, 101, entrada, saida)
+        hotel1.salvar_dados('data/teste_hotel.json')
+        
+        hotel2 = Hotel("Vazio")
+        self.assertTrue(hotel2.carregar_dados('data/teste_hotel.json'))
+    
+    def test_03_verificar_integridade_dados(self):
+        """TC-PERS-003: Verificar integridade dos dados"""
+        hotel1 = Hotel("Hotel Teste")
+        cliente = hotel1.cadastrar_cliente("Maria", "Rua X", "31999999999")
+        hotel1.cadastrar_funcionario("Ana", "31988888888", "Recepcionista", 2500.00)
+        hotel1.adicionar_quarto(101, "Simples", 1, 150.00)
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        hotel1.fazer_estadia(cliente.codigo, 101, entrada, saida)
+        hotel1.salvar_dados('data/teste_hotel.json')
+        
+        hotel2 = Hotel("Vazio")
+        hotel2.carregar_dados('data/teste_hotel.json')
+        
+        self.assertEqual(len(hotel2.clientes), 1, "Deve ter 1 cliente")
+        self.assertEqual(len(hotel2.funcionarios), 1, "Deve ter 1 funcionario")
+        self.assertEqual(len(hotel2.quartos), 1, "Deve ter 1 quarto")
+        self.assertEqual(len(hotel2.estadias), 1, "Deve ter 1 estadia")
+        self.assertEqual(hotel2.clientes[0].nome, "Maria", "Nome deve ser preservado")
+        self.assertEqual(hotel2.quartos[0].quantidade_hospedes, 1, "Quantidade_hospedes preservada")
+        self.assertEqual(hotel2.quartos[0].status, "Disponível", "Status preservado")
+        
+        # Limpa arquivo de teste
+        if os.path.exists('data/teste_hotel.json'):
+            os.remove('data/teste_hotel.json')
+
+
+class TestValidacoesRestricoes(unittest.TestCase):
+    """Testa TODAS as validacoes e restricoes mencionadas no PDF (3 testes)"""
+    
+    def setUp(self):
+        """Executado antes de cada teste"""
+        self.hotel = Hotel("Hotel Teste")
+        self.cliente = self.hotel.cadastrar_cliente("Cliente Teste", "End", "31999999999")
+        self.hotel.adicionar_quarto(101, "Simples", 1, 150.00)
+    
+    def test_01_cliente_deve_existir_para_criar_estadia(self):
+        """TC-VAL-001: Cliente deve existir para criar estadia"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia_invalida = self.hotel.cadastrar_estadia(999, 1, entrada, saida)
+        
+        self.assertIsNone(estadia_invalida, "Nao deve criar estadia sem cliente")
+    
+    def test_02_quarto_deve_existir(self):
+        """TC-VAL-002: Quarto deve existir"""
+        entrada = date.today() + timedelta(days=1)
+        saida = entrada + timedelta(days=2)
+        estadia_invalida = self.hotel.fazer_estadia(self.cliente.codigo, 999, entrada, saida)
+        
+        self.assertIsNone(estadia_invalida, "Nao deve criar estadia sem quarto")
+    
+    def test_03_status_do_quarto_conforme_pdf(self):
+        """TC-VAL-003: Status do quarto conforme PDF"""
+        q = self.hotel.quartos[0]
+        self.assertIn(q.status, ["Ocupado", "Disponível", "Manutenção"], "Status deve ser Ocupado, Disponível ou Manutenção")
+
+
+if __name__ == '__main__':
+    # Configurar o runner do unittest para mostrar mais detalhes
+    unittest.main(verbosity=2)
