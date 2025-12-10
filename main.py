@@ -102,20 +102,33 @@ class SistemaHotel:
     def cadastrar_cliente(self):
         limpar_tela()
         subtitulo("Cadastrar Cliente")
+        msg_info("Digite 0 para cancelar a qualquer momento\n")
         
         nome = input("Nome: ").strip()
+        if nome == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         if not nome:
             msg_erro("Nome nao pode ser vazio")
             pausar()
             return
         
         endereco = input("Endereco: ").strip()
+        if endereco == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         if not endereco:
             msg_erro("Endereco nao pode ser vazio")
             pausar()
             return
         
         telefone = input("Telefone: ").strip()
+        if telefone == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         if not telefone:
             msg_erro("Telefone nao pode ser vazio")
             pausar()
@@ -205,14 +218,23 @@ class SistemaHotel:
     def cadastrar_funcionario(self):
         limpar_tela()
         subtitulo("Cadastrar Funcionario")
+        msg_info("Digite 0 para cancelar a qualquer momento\n")
         
         nome = input("Nome: ").strip()
+        if nome == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         if not nome:
             msg_erro("Nome nao pode ser vazio")
             pausar()
             return
         
         telefone = input("Telefone: ").strip()
+        if telefone == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         if not telefone:
             msg_erro("Telefone nao pode ser vazio")
             pausar()
@@ -220,12 +242,20 @@ class SistemaHotel:
         
         print("\nCargos sugeridos: Recepcionista, Gerente, Garcom, Auxiliar de Limpeza")
         cargo = input("Cargo: ").strip()
+        if cargo == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         if not cargo:
             msg_erro("Cargo nao pode ser vazio")
             pausar()
             return
         
         salario_str = input("Salario (R$): ").strip()
+        if salario_str == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         salario = validar_preco(salario_str)
         if not salario:
             msg_erro("Salario invalido")
@@ -289,8 +319,13 @@ class SistemaHotel:
     def cadastrar_quarto(self):
         limpar_tela()
         subtitulo("Cadastrar Novo Quarto")
+        msg_info("Digite 0 para cancelar a qualquer momento\n")
         
         numero_str = input("Numero do quarto: ").strip()
+        if numero_str == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         numero = validar_numero(numero_str, minimo=1)
         if not numero:
             print("numero invalido")
@@ -304,6 +339,10 @@ class SistemaHotel:
         
         print("\nTipos: Simples, Duplo, Suite")
         tipo_input = input("Tipo: ").strip()
+        if tipo_input == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         tipo = validar_tipo_quarto(tipo_input)
         if not tipo:
             print("tipo invalido")
@@ -311,6 +350,10 @@ class SistemaHotel:
             return
         
         capacidade_str = input("Quantidade de hospedes: ").strip()
+        if capacidade_str == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         quantidade_hospedes = validar_numero(capacidade_str, minimo=1)
         if not quantidade_hospedes or quantidade_hospedes > 10:
             msg_erro("Quantidade invalida (1-10)")
@@ -318,6 +361,10 @@ class SistemaHotel:
             return
         
         preco_str = input("Preco da diaria (R$): ").strip()
+        if preco_str == "0":
+            msg_info("Cadastro cancelado.")
+            pausar()
+            return
         preco = validar_preco(preco_str)
         if not preco:
             msg_erro("Preco invalido")
@@ -355,11 +402,16 @@ class SistemaHotel:
     def alterar_status_quarto(self):
         limpar_tela()
         subtitulo("Alterar Status do Quarto")
+        msg_info("Digite 0 para cancelar\n")
         
         quartos = self.hotel.listar_quartos()
         tabela_quartos(quartos)
         
         numero_str = input("\nNumero do quarto: ").strip()
+        if numero_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         numero = validar_numero(numero_str)
         
         if not numero:
@@ -398,6 +450,7 @@ class SistemaHotel:
     def fazer_estadia(self):
         limpar_tela()
         subtitulo("Fazer Estadia")
+        msg_info("Digite 0 para cancelar a qualquer momento\n")
         
         # mostra clientes
         print("Clientes cadastrados:")
@@ -411,6 +464,10 @@ class SistemaHotel:
             print(f"  {c.codigo} - {c.nome}")
         
         codigo_str = input("\nCodigo do cliente: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         codigo_cliente = validar_numero(codigo_str, minimo=1)
         if not codigo_cliente:
             msg_erro("Codigo invalido")
@@ -427,6 +484,10 @@ class SistemaHotel:
         
         # CONFORME PDF ITEM 4: pede quantidade de hospedes
         hospedes_str = input("Quantidade de hospedes: ").strip()
+        if hospedes_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         quantidade_hospedes = validar_numero(hospedes_str, minimo=1)
         if not quantidade_hospedes:
             msg_erro("Quantidade invalida")
@@ -434,6 +495,10 @@ class SistemaHotel:
             return
         
         entrada_str = input("Data entrada (DD/MM/AAAA): ").strip()
+        if entrada_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         data_entrada = validar_data(entrada_str)
         if not data_entrada:
             msg_erro("Data invalida")
@@ -446,6 +511,10 @@ class SistemaHotel:
             return
         
         saida_str = input("Data saida (DD/MM/AAAA): ").strip()
+        if saida_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         data_saida = validar_data(saida_str)
         if not data_saida:
             msg_erro("Data invalida")
@@ -498,8 +567,13 @@ class SistemaHotel:
     def consultar_estadia(self):
         limpar_tela()
         subtitulo("Consultar Estadia")
+        msg_info("Digite 0 para cancelar\n")
         
         codigo_str = input("Codigo da estadia: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         codigo = validar_numero(codigo_str, minimo=1)
         
         if not codigo:
@@ -527,6 +601,7 @@ class SistemaHotel:
     def cancelar_estadia(self):
         limpar_tela()
         subtitulo("Cancelar Estadia")
+        msg_info("Digite 0 para cancelar\n")
         
         print("Estadias ativas:")
         ativas = self.hotel.listar_estadias_ativas()
@@ -536,11 +611,15 @@ class SistemaHotel:
             pausar()
             return
         
-        for e in ativas:
+        for e in confirmadas:
             cliente = self.hotel.buscar_cliente_por_codigo(e.codigo_cliente)
-            print(f"  {e.codigo} - Cliente: {cliente.nome if cliente else 'N/A'} - Quarto: {e.quarto.numero}")
+            print(f"  {e.codigo} - {cliente.nome if cliente else 'N/A'} - Quarto {e.quarto.numero}")
         
         codigo_str = input("\nCodigo da estadia: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         codigo = validar_numero(codigo_str, minimo=1)
         
         if not codigo:
@@ -548,7 +627,7 @@ class SistemaHotel:
             pausar()
             return
         
-        if self.hotel.cancelar_estadia(codigo):
+        if self.hotel.fazer_checkin(codigo):
             msg_sucesso("Estadia cancelada!")
             self.hotel.salvar_dados()
         else:
@@ -602,6 +681,7 @@ class SistemaHotel:
     def realizar_checkin(self):
         limpar_tela()
         subtitulo("Realizar Check-in")
+        msg_info("Digite 0 para cancelar\n")
         
         print("Estadias confirmadas:")
         confirmadas = [e for e in self.hotel.listar_estadias() if e.status == "Confirmada"]
@@ -616,6 +696,10 @@ class SistemaHotel:
             print(f"  {e.codigo} - {cliente.nome if cliente else 'N/A'} - Quarto {e.quarto.numero}")
         
         codigo_str = input("\nCodigo da estadia: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         codigo = validar_numero(codigo_str, minimo=1)
         
         if not codigo:
@@ -634,6 +718,7 @@ class SistemaHotel:
     def realizar_checkout(self):
         limpar_tela()
         subtitulo("Realizar Check-out (Baixa)")
+        msg_info("Digite 0 para cancelar\n")
         
         print("Quartos ocupados:")
         ocupados = self.hotel.listar_quartos_ocupados()
@@ -652,6 +737,10 @@ class SistemaHotel:
             print(f"  {e.codigo} - {cliente.nome if cliente else 'N/A'} - Quarto {e.quarto.numero}")
         
         codigo_str = input("\nCodigo da estadia: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
         codigo = validar_numero(codigo_str, minimo=1)
         
         if not codigo:
