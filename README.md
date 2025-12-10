@@ -101,13 +101,7 @@ TI---Fundamentos-AED/
 - Ao encerrar o sistema, todos os dados ficam preservados
 - Na próxima execução, o estado anterior é restaurado
 
-**Por que pickle?**  
-O pickle serializa objetos Python mantendo suas estruturas e relacionamentos, adequado para este projeto acadêmico. O arquivo `.bin` é binário, não sendo legível diretamente por editores de texto.
-- ✅ Fez um check-in? → Salvo automaticamente
-- ✅ Fechou o sistema? → Dados preservados!
-- ✅ Abriu o sistema de novo? → Tudo carregado como você deixou
 
-**Nota:** O arquivo é `.bin` (binário) porque usamos pickle do Python para salvar. 
 
 ---
 ## Primeira Execução
