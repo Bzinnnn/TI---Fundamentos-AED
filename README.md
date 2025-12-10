@@ -261,7 +261,7 @@ Outras opções:
 
 ## Testes Automatizados
 
-O projeto implementa **48 testes automatizados** utilizando a biblioteca **unittest** (biblioteca padrão do Python, sem necessidade de instalação externa).
+O projeto implementa **48 testes automatizados** utilizando a biblioteca **unittest** (biblioteca padrão do Python).
 
 ### Executando os Testes
 
@@ -367,22 +367,7 @@ TI---Fundamentos-AED/
   - `os` - Operações com sistema de arquivos
   - `sys` - Configurações do sistema e caminhos
 
-**Observação:** O projeto utiliza apenas bibliotecas padrão do Python, não sendo necessário instalar dependências externas via pip.
-│   ├── 📁 ui/                       ← Interface (menus)
-│   │   └── menu.py
-│   │
-│   └── 📁 utils/                    ← Funções auxiliares
-│       └── utils.py
-│
-├── 📁 data/                      ← Dados salvos aqui!
-│   └── hotel_dados.bin              (criado automaticamente)
-│
-├── 📁 tests/                     ← Testes automatizados
-│   └── testes.py
-│
-└── 📁 docs/                      ← Documentação
-    ├── DOCUMENTACAO_TECNICA.md      (detalhes técnicos)
-    └── CASOS_DE_TESTE.md            (casos de teste)
+
 ```
 
 ---
