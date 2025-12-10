@@ -1,46 +1,56 @@
 # Sistema de Gerenciamento - Hotel Descanso Garantido
 
-Sistema completo de gerenciamento hoteleiro desenvolvido em Python para o trabalho prático de Algoritmos e Estruturas de Dados (AED).
+Sistema de gerenciamento hoteleiro desenvolvido em Python para o trabalho prático da disciplina de Algoritmos e Estruturas de Dados (AED).
 
-## 📋 Descrição do Projeto
+## Descrição do Projeto
 
-Este sistema permite gerenciar todas as operações de um hotel, incluindo cadastro de quartos, reservas, check-in/check-out e geração de relatórios.
+O sistema permite gerenciar as operações de um hotel, incluindo cadastro de clientes, funcionários, quartos, estadias e check-in/check-out.
 
-## 🚀 Funcionalidades Implementadas
+## Funcionalidades do Sistema
+
+### Gerenciamento de Clientes
+- Cadastrar cliente
+- Listar clientes
+- Pesquisar cliente por codigo
+- Consultar pontos de fidelidade
+- Remover cliente
+
+### Gerenciamento de Funcionarios
+- Cadastrar funcionario
+- Listar funcionarios
+- Pesquisar funcionario por codigo
+- Remover funcionario
 
 ### Gerenciamento de Quartos
-- ✅ Cadastrar novos quartos
-- ✅ Listar todos os quartos
-- ✅ Consultar quartos disponíveis
-- ✅ Alterar status do quarto (Disponível, Ocupado, Manutenção)
-- ✅ Tipos de quartos: Simples, Duplo, Suíte
+- Cadastrar quarto
+- Listar quartos
+- Consultar quartos disponiveis
+- Alterar status (Disponivel, Ocupado, Manutencao)
+- Remover quarto
 
-### Sistema de Reservas
-- ✅ Fazer nova reserva
-- ✅ Listar todas as reservas
-- ✅ Consultar reserva específica
-- ✅ Cancelar reserva
-- ✅ Verificar disponibilidade por período
-- ✅ Buscar reservas por hóspede (CPF)
+### Sistema de Estadias
+- Fazer estadia (busca automatica de quarto disponivel)
+- Listar estadias
+- Consultar estadia especifica
+- Cancelar estadia
+- Estadias por cliente
 
 ### Check-in e Check-out
-- ✅ Realizar check-in de hóspedes
-- ✅ Realizar check-out de hóspedes
-- ✅ Cálculo automático do valor total da estadia
+- Realizar check-in (marca quarto como ocupado)
+- Realizar check-out com calculo de diarias
 
-### Relatórios
-- ✅ Relatório de ocupação (taxa de ocupação, quartos disponíveis/ocupados)
-- ✅ Relatório de receita (total, concluída, pendente)
-- ✅ Estatísticas gerais do hotel
+### Relatorios
+- Relatorio de ocupacao do hotel
+- Relatorio de receita
 
-### Recursos Adicionais
-- ✅ Persistência de dados em JSON
-- ✅ Validação de entradas (CPF, datas, números)
-- ✅ Tratamento de erros
-- ✅ Interface intuitiva no console
-- ✅ Mensagens formatadas e coloridas
+### Recursos Tecnicos
+- Persistencia de dados em arquivo binario (pickle)
+- Validacao de entradas do usuario
+- Tratamento de erros
+- Interface de console organizada
+- Opcao de cancelar operacoes (digitar 0)
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 TI---Fundamentos-AED/
@@ -54,128 +64,179 @@ TI---Fundamentos-AED/
 └── hotel_dados.json  # Dados persistidos (gerado automaticamente)
 ```
 
-## 🔧 Como Executar
+## Como Executar
 
-### Pré-requisitos
-- Python 3.7 ou superior instalado
+### Requisitos
+- Python 3.12 ou superior
 
-### Executando o Sistema
+### Execucao
 
 1. Abra o terminal na pasta do projeto
-2. Execute o comando:
+2. Execute:
    ```bash
    python main.py
    ```
 
-3. O sistema iniciará com dados de exemplo pré-cadastrados
+3. O sistema vai iniciar e criar o arquivo de dados se necessario
 
-## 💡 Como Usar
+## Como Usar
 
 ### Menu Principal
-Ao executar, você verá um menu com as seguintes opções:
+O sistema apresenta um menu com 23 opcoes organizadas por categoria:
 
 ```
-1.  Cadastrar Quarto
-2.  Listar Quartos
-3.  Consultar Quartos Disponíveis
-4.  Fazer Reserva
-5.  Listar Reservas
-6.  Consultar Reserva
-7.  Cancelar Reserva
-8.  Realizar Check-in
-9.  Realizar Check-out
-10. Relatório de Ocupação
-11. Relatório de Receita
-12. Buscar Reservas por Hóspede
+CLIENTES (1-5)
+1.  Cadastrar Cliente
+2.  Listar Clientes
+3.  Pesquisar Cliente
+4.  Pontos de Fidelidade
+5.  Remover Cliente
+
+FUNCIONARIOS (6-9)
+6.  Cadastrar Funcionario
+7.  Listar Funcionarios
+8.  Pesquisar Funcionario
+9.  Remover Funcionario
+
+QUARTOS (10-14)
+10. Cadastrar Quarto
+11. Listar Quartos
+12. Consultar Quartos Disponiveis
 13. Alterar Status do Quarto
-0.  Sair
+14. Remover Quarto
+
+ESTADIAS (15-19)
+15. Fazer Estadia
+16. Listar Estadias
+17. Consultar Estadia
+18. Cancelar Estadia
+19. Estadias por Cliente
+
+CHECK-IN/OUT (20-21)
+20. Realizar Check-in
+21. Realizar Check-out (Baixa)
+
+RELATORIOS (22-23)
+22. Relatorio de Ocupacao
+23. Relatorio de Receita
+
+0. Sair
 ```
 
 ### Exemplos de Uso
 
-#### 1. Fazer uma Reserva
-- Selecione opção 4
-- Informe o nome do hóspede
-- Informe o CPF (apenas números)
-- Escolha um quarto da lista disponível
-- Informe data de check-in (formato: DD/MM/AAAA)
-- Informe data de check-out (formato: DD/MM/AAAA)
+#### 1. Cadastrar um Cliente
+- Selecione opcao 1
+- Informe nome, CPF, telefone, email
+- Digite 0 em qualquer campo para cancelar
 
-#### 2. Realizar Check-in
-- Selecione opção 8
-- Informe o ID da reserva
-- O quarto será marcado como ocupado
+#### 2. Fazer uma Estadia
+- Selecione opcao 15
+- Informe codigo do cliente
+- Informe quantidade de hospedes
+- Informe datas (formato DD/MM/AAAA)
+- Sistema busca automaticamente um quarto disponivel
 
-#### 3. Gerar Relatório
-- Selecione opção 10 (Ocupação) ou 11 (Receita)
-- Visualize as estatísticas do hotel
+#### 3. Realizar Check-in
+- Selecione opcao 20
+- Informe codigo da estadia
+- O quarto sera marcado como Ocupado
 
-## 📊 Estruturas de Dados Utilizadas
+#### 4. Gerar Relatorios
+- Opcao 22 mostra ocupacao atual do hotel
+- Opcao 23 mostra receita total e por status
+
+## Estruturas de Dados
+
+### Classe Cliente
+```python
+- codigo: int (gerado automaticamente)
+- nome: str
+- cpf: str
+- telefone: str
+- email: str
+- pontos_fidelidade: int
+```
+
+### Classe Funcionario
+```python
+- codigo: int (gerado automaticamente)
+- nome: str
+- cpf: str
+- cargo: str
+- salario: float
+```
 
 ### Classe Quarto
 ```python
 - numero: int
-- tipo: str
-- capacidade: int
+- tipo: str (Simples, Duplo, Suite)
+- quantidade_hospedes: int
 - preco_diaria: float
-- status: str
+- status: str (Disponivel, Ocupado, Manutencao)
 ```
 
-### Classe Reserva
+### Classe Estadia
 ```python
-- id: int (auto-incremento)
-- nome_hospede: str
-- cpf_hospede: str
+- codigo: int (gerado automaticamente)
+- codigo_cliente: int
 - quarto: Quarto
-- data_checkin: date
-- data_checkout: date
-- status: str
+- data_entrada: date
+- data_saida: date
+- quantidade_diarias: int
 - valor_total: float
+- status: str (Pendente, Confirmada, Cancelada, Concluida)
 ```
 
 ### Classe Hotel
 ```python
 - nome: str
-- quartos: list[Quarto]
-- reservas: list[Reserva]
+- clientes: list
+- funcionarios: list
+- quartos: list
+- estadias: list
 ```
 
-## ✅ Requisitos Atendidos
+## Requisitos Implementados
 
-- [x] **Estruturas de Dados**: Uso de listas, dicionários e classes
-- [x] **Algoritmos de Busca**: Busca linear em listas
-- [x] **Validação de Dados**: CPF, datas, números
-- [x] **Persistência**: Salvamento em JSON
-- [x] **Modularização**: Código organizado em módulos
-- [x] **Interface Interativa**: Menu completo no console
-- [x] **Tratamento de Erros**: Try-catch e validações
-- [x] **Documentação**: Docstrings em todas as funções
-- [x] **Boas Práticas**: PEP8, nomes descritivos
+- Uso de classes e programacao orientada a objetos
+- Listas para armazenar clientes, funcionarios, quartos e estadias
+- Algoritmos de busca linear
+- Validacao de dados (CPF, datas, numeros)
+- Persistencia com pickle (arquivo binario)
+- Codigo organizado em modulos (models, ui, utils)
+- Interface interativa no console
+- Tratamento de erros e validacoes
+- Documentacao no codigo
 
-## 🎯 Funcionalidades Avançadas
+## Funcionalidades Tecnicas
 
-1. **Validação de CPF**: Verifica formato e dígitos
-2. **Verificação de Disponibilidade**: Checa conflitos de datas
-3. **Cálculo Automático**: Valor total baseado em diárias
-4. **Status de Quartos**: Disponível, Ocupado, Manutenção
-5. **Status de Reservas**: Pendente, Confirmada, Cancelada, Concluída
-6. **Persistência Automática**: Dados salvos a cada operação
-7. **Dados de Exemplo**: Sistema inicia com quartos pré-cadastrados
+1. Validacao de CPF com verificacao de formato
+2. Verificacao de disponibilidade por periodo (evita conflitos de data)
+3. Calculo automatico de diarias e valor total
+4. Sistema de status para quartos e estadias
+5. Busca automatica de quarto disponivel com capacidade adequada
+6. Check-in marca quarto como ocupado
+7. Check-out libera quarto e recalcula valores se necessario
+8. Relatorios de ocupacao e receita
+9. Sistema de pontos de fidelidade para clientes
+10. Validacao antes de remover registros (verifica estadias ativas)
 
-## 📝 Observações
+## Observacoes Importantes
 
-- Os dados são salvos automaticamente no arquivo `hotel_dados.json`
-- O sistema carrega dados salvos ao iniciar
-- Validações impedem erros de entrada do usuário
-- Interface clara com mensagens de sucesso/erro
+- Dados salvos em data/hotel_dados.bin (formato pickle)
+- Sistema carrega dados automaticamente ao iniciar
+- Digite 0 em qualquer entrada para cancelar operacao
+- Quarto so fica ocupado apos check-in, nao ao criar estadia
+- Nao e possivel remover cliente/quarto com estadia ativa
 
-## 👨‍💻 Desenvolvimento
+## Informacoes Tecnicas
 
-**Linguagem**: Python 3
-**Paradigma**: Programação Orientada a Objetos
-**Armazenamento**: JSON
+**Linguagem**: Python 3.12+
+**Paradigma**: Orientacao a Objetos
+**Armazenamento**: Pickle (binario)
+**Bibliotecas**: Apenas bibliotecas padrao do Python
 
----
-
-**Desenvolvido para**: Trabalho Prático de AED
+**Desenvolvido para**: Trabalho Pratico de AED - PUC Minas
+**Periodo**: 1o Periodo
 **Data**: Dezembro de 2025
