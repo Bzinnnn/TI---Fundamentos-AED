@@ -53,6 +53,21 @@ class Hotel:
     def listar_clientes(self):
         return self.clientes
     
+    def remover_cliente(self, codigo):
+        """Remove um cliente se ele não tiver estadias ativas"""
+        cliente = self.buscar_cliente_por_codigo(codigo)
+        if not cliente:
+            return False, "Cliente não encontrado"
+        
+        # Verifica se tem estadias ativas
+        estadias_ativas = [e for e in self.estadias if e.codigo_cliente == codigo and e.status in ["Confirmada", "ativa"]]
+        if estadias_ativas:
+            return False, f"Cliente possui {len(estadias_ativas)} estadia(s) ativa(s). Não é possível remover."
+        
+        # Remove o cliente
+        self.clientes.remove(cliente)
+        return True, "Cliente removido com sucesso"
+    
     # --- funcionarios ---
     
     def cadastrar_funcionario(self, nome, telefone, cargo, salario):
@@ -86,6 +101,21 @@ class Hotel:
     def listar_funcionarios(self):
         return self.funcionarios
     
+    def remover_funcionario(self, codigo):
+        """Remove um funcionário se ele não tiver estadias vinculadas"""
+        funcionario = self.buscar_funcionario_por_codigo(codigo)
+        if not funcionario:
+            return False, "Funcionário não encontrado"
+        
+        # Verifica se tem estadias vinculadas
+        estadias_vinculadas = [e for e in self.estadias if e.codigo_funcionario == codigo]
+        if estadias_vinculadas:
+            return False, f"Funcionário possui {len(estadias_vinculadas)} estadia(s) vinculada(s). Não é possível remover."
+        
+        # Remove o funcionário
+        self.funcionarios.remove(funcionario)
+        return True, "Funcionário removido com sucesso"
+    
     # --- quartos ---
     
     def adicionar_quarto(self, numero, tipo, quantidade_hospedes, preco_diaria):
@@ -114,6 +144,21 @@ class Hotel:
     
     def listar_quartos_ocupados(self):
         return [q for q in self.quartos if q.status == "Ocupado"]
+    
+    def remover_quarto(self, numero):
+        """Remove um quarto se ele não tiver estadias vinculadas"""
+        quarto = self.buscar_quarto_por_numero(numero)
+        if not quarto:
+            return False, "Quarto não encontrado"
+        
+        # Verifica se tem estadias vinculadas
+        estadias_vinculadas = [e for e in self.estadias if e.quarto.numero == numero]
+        if estadias_vinculadas:
+            return False, f"Quarto possui {len(estadias_vinculadas)} estadia(s) vinculada(s). Não é possível remover."
+        
+        # Remove o quarto
+        self.quartos.remove(quarto)
+        return True, "Quarto removido com sucesso"
     
     def listar_quartos_por_tipo(self, tipo):
         resultado = []

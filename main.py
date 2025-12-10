@@ -60,36 +60,42 @@ class SistemaHotel:
             elif opcao == 4:
                 self.pontos_fidelidade()
             elif opcao == 5:
-                self.cadastrar_funcionario()
+                self.remover_cliente()
             elif opcao == 6:
-                self.listar_funcionarios()
+                self.cadastrar_funcionario()
             elif opcao == 7:
-                self.pesquisar_funcionario()
+                self.listar_funcionarios()
             elif opcao == 8:
-                self.cadastrar_quarto()
+                self.pesquisar_funcionario()
             elif opcao == 9:
-                self.listar_quartos()
+                self.remover_funcionario()
             elif opcao == 10:
-                self.consultar_quartos_disponiveis()
+                self.cadastrar_quarto()
             elif opcao == 11:
-                self.alterar_status_quarto()
+                self.listar_quartos()
             elif opcao == 12:
-                self.fazer_estadia()
+                self.consultar_quartos_disponiveis()
             elif opcao == 13:
-                self.listar_estadias()
+                self.alterar_status_quarto()
             elif opcao == 14:
-                self.consultar_estadia()
+                self.remover_quarto()
             elif opcao == 15:
-                self.cancelar_estadia()
+                self.fazer_estadia()
             elif opcao == 16:
-                self.estadias_por_cliente()
+                self.listar_estadias()
             elif opcao == 17:
-                self.realizar_checkin()
+                self.consultar_estadia()
             elif opcao == 18:
-                self.realizar_checkout()
+                self.cancelar_estadia()
             elif opcao == 19:
-                self.relatorio_ocupacao()
+                self.estadias_por_cliente()
             elif opcao == 20:
+                self.realizar_checkin()
+            elif opcao == 21:
+                self.realizar_checkout()
+            elif opcao == 22:
+                self.relatorio_ocupacao()
+            elif opcao == 23:
                 self.relatorio_receita()
             elif opcao == 0:
                 self.sair()
@@ -213,6 +219,60 @@ class SistemaHotel:
         
         pausar()
     
+    def remover_cliente(self):
+        limpar_tela()
+        subtitulo("Remover Cliente")
+        msg_info("Digite 0 para cancelar\n")
+        
+        # Lista clientes
+        clientes = self.hotel.listar_clientes()
+        if not clientes:
+            msg_info("Nenhum cliente cadastrado.")
+            pausar()
+            return
+        
+        print("Clientes cadastrados:")
+        for c in clientes:
+            print(f"  {c.codigo} - {c.nome}")
+        
+        codigo_str = input("\nCodigo do cliente a remover: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        codigo = validar_numero(codigo_str, minimo=1)
+        if not codigo:
+            msg_erro("Codigo invalido")
+            pausar()
+            return
+        
+        cliente = self.hotel.buscar_cliente_por_codigo(codigo)
+        if not cliente:
+            msg_erro("Cliente nao encontrado")
+            pausar()
+            return
+        
+        # Confirmação
+        print(f"\nCliente: {cliente.nome}")
+        print(f"Endereco: {cliente.endereco}")
+        print(f"Telefone: {cliente.telefone}")
+        
+        confirmar = input("\nTem certeza que deseja remover? (s/n): ").strip().lower()
+        if confirmar != 's':
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        sucesso, mensagem = self.hotel.remover_cliente(codigo)
+        if sucesso:
+            msg_sucesso(mensagem)
+            self.hotel.salvar_dados()
+        else:
+            msg_erro(mensagem)
+        
+        pausar()
+    
     # --- funcionarios ---
     
     def cadastrar_funcionario(self):
@@ -311,6 +371,61 @@ class SistemaHotel:
                 print(f"Cargo: {f.cargo}")
                 print(f"Salario: R${f.salario:.2f}")
                 linha('-', 40)
+        
+        pausar()
+    
+    def remover_funcionario(self):
+        limpar_tela()
+        subtitulo("Remover Funcionario")
+        msg_info("Digite 0 para cancelar\n")
+        
+        # Lista funcionários
+        funcionarios = self.hotel.listar_funcionarios()
+        if not funcionarios:
+            msg_info("Nenhum funcionario cadastrado.")
+            pausar()
+            return
+        
+        print("Funcionarios cadastrados:")
+        for f in funcionarios:
+            print(f"  {f.codigo} - {f.nome} ({f.cargo})")
+        
+        codigo_str = input("\nCodigo do funcionario a remover: ").strip()
+        if codigo_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        codigo = validar_numero(codigo_str, minimo=1)
+        if not codigo:
+            msg_erro("Codigo invalido")
+            pausar()
+            return
+        
+        funcionario = self.hotel.buscar_funcionario_por_codigo(codigo)
+        if not funcionario:
+            msg_erro("Funcionario nao encontrado")
+            pausar()
+            return
+        
+        # Confirmação
+        print(f"\nFuncionario: {funcionario.nome}")
+        print(f"Cargo: {funcionario.cargo}")
+        print(f"Telefone: {funcionario.telefone}")
+        print(f"Salario: R${funcionario.salario:.2f}")
+        
+        confirmar = input("\nTem certeza que deseja remover? (s/n): ").strip().lower()
+        if confirmar != 's':
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        sucesso, mensagem = self.hotel.remover_funcionario(codigo)
+        if sucesso:
+            msg_sucesso(mensagem)
+            self.hotel.salvar_dados()
+        else:
+            msg_erro(mensagem)
         
         pausar()
     
@@ -442,6 +557,61 @@ class SistemaHotel:
             self.hotel.salvar_dados()
         else:
             msg_erro("Opcao invalida")
+        
+        pausar()
+    
+    def remover_quarto(self):
+        limpar_tela()
+        subtitulo("Remover Quarto")
+        msg_info("Digite 0 para cancelar\n")
+        
+        # Lista quartos
+        quartos = self.hotel.listar_quartos()
+        if not quartos:
+            msg_info("Nenhum quarto cadastrado.")
+            pausar()
+            return
+        
+        print("Quartos cadastrados:")
+        tabela_quartos(quartos)
+        
+        numero_str = input("\nNumero do quarto a remover: ").strip()
+        if numero_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        numero = validar_numero(numero_str, minimo=1)
+        if not numero:
+            msg_erro("Numero invalido")
+            pausar()
+            return
+        
+        quarto = self.hotel.buscar_quarto_por_numero(numero)
+        if not quarto:
+            msg_erro("Quarto nao encontrado")
+            pausar()
+            return
+        
+        # Confirmação
+        print(f"\nQuarto: {quarto.numero}")
+        print(f"Tipo: {quarto.tipo}")
+        print(f"Capacidade: {quarto.quantidade_hospedes} hospede(s)")
+        print(f"Preco: R${quarto.preco_diaria:.2f}/diaria")
+        print(f"Status: {quarto.status}")
+        
+        confirmar = input("\nTem certeza que deseja remover? (s/n): ").strip().lower()
+        if confirmar != 's':
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        sucesso, mensagem = self.hotel.remover_quarto(numero)
+        if sucesso:
+            msg_sucesso(mensagem)
+            self.hotel.salvar_dados()
+        else:
+            msg_erro(mensagem)
         
         pausar()
     
