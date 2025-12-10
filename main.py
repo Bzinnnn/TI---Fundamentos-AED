@@ -700,9 +700,15 @@ class SistemaHotel:
             print(f"Quarto alocado: {estadia.quarto.numero} (quantidade hospedes: {estadia.quarto.quantidade_hospedes})")
             print(f"Diarias: {estadia.quantidade_diarias}")
             print(f"Valor: R${estadia.valor_total:.2f}")
+            print(f"\nStatus: {estadia.status}")
+            print(f"Status do quarto: {estadia.quarto.status} (sera Ocupado apos check-in)")
             self.hotel.salvar_dados()
         else:
-            msg_erro("Nao foi possivel fazer a estadia. Nenhum quarto disponivel com capacidade suficiente.")
+            msg_erro("Nao foi possivel fazer a estadia.")
+            print("Possiveis motivos:")
+            print("  - Datas invalidas (saida anterior ou igual a entrada)")
+            print("  - Nenhum quarto disponivel com capacidade suficiente para o periodo")
+            print("  - Todos quartos com capacidade estao ocupados nas datas")
         
         pausar()
     
@@ -781,7 +787,7 @@ class SistemaHotel:
             pausar()
             return
         
-        for e in confirmadas:
+        for e in ativas:
             cliente = self.hotel.buscar_cliente_por_codigo(e.codigo_cliente)
             print(f"  {e.codigo} - {cliente.nome if cliente else 'N/A'} - Quarto {e.quarto.numero}")
         
@@ -797,7 +803,7 @@ class SistemaHotel:
             pausar()
             return
         
-        if self.hotel.fazer_checkin(codigo):
+        if self.hotel.cancelar_estadia(codigo):
             msg_sucesso("Estadia cancelada!")
             self.hotel.salvar_dados()
         else:
@@ -925,7 +931,23 @@ class SistemaHotel:
             pausar()
             return
         
-        sucesso, resultado = self.hotel.fazer_checkout(codigo)
+        print(f"\nEstadia: {estadia.codigo}")
+        print(f"Data entrada: {estadia.data_entrada.strftime('%d/%m/%Y')}")
+        print(f"Data saida prevista: {estadia.data_saida.strftime('%d/%m/%Y')}")
+        
+        data_checkout_str = input("\nData do checkout (DD/MM/AAAA): ").strip()
+        if data_checkout_str == "0":
+            msg_info("Operacao cancelada.")
+            pausar()
+            return
+        
+        data_checkout = validar_data(data_checkout_str)
+        if not data_checkout:
+            msg_erro("Data invalida")
+            pausar()
+            return
+        
+        sucesso, resultado = self.hotel.fazer_checkout(codigo, data_checkout)
         
         if sucesso:
             msg_sucesso("Check-out realizado!")

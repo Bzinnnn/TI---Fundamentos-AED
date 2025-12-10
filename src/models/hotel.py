@@ -191,8 +191,9 @@ class Hotel:
             if quarto.quantidade_hospedes < quantidade_hospedes:
                 continue
             
-            # verifica status
-            if quarto.status != "Disponível":
+            # NÃO verifica status - verifica disponibilidade por período
+            # (quarto pode estar em manutenção mas livre na data)
+            if quarto.status == "Manutenção":
                 continue
             
             # verifica disponibilidade no periodo
@@ -207,6 +208,7 @@ class Hotel:
         # cria estadia no quarto encontrado
         estadia = Estadia(codigo_cliente, quarto_disponivel, data_entrada, data_saida)
         estadia.confirmar()
+        # NÃO marca como ocupado aqui - só no check-in
         self.estadias.append(estadia)
         return estadia
     
@@ -225,7 +227,8 @@ class Hotel:
         if not quarto:
             return None
         
-        if quarto.status != "Disponível":
+        # Não verifica status - apenas disponibilidade por data
+        if quarto.status == "Manutenção":
             return None
         
         # valida datas
@@ -243,9 +246,10 @@ class Hotel:
         return estadia
     
     def verificar_disponibilidade(self, numero_quarto, data_entrada, data_saida):
-        """verifica se quarto ta livre no periodo"""
+        """verifica se quarto ta livre no periodo - considera apenas estadias ativas"""
         for estadia in self.estadias:
-            if estadia.quarto.numero == numero_quarto and estadia.status != "Cancelada":
+            # Só considera estadias que não foram canceladas ou concluídas
+            if estadia.quarto.numero == numero_quarto and estadia.status in ["Pendente", "Confirmada"]:
                 # checa sobreposicao de datas
                 if not (data_saida <= estadia.data_entrada or data_entrada >= estadia.data_saida):
                     return False
@@ -284,19 +288,22 @@ class Hotel:
             return estadia.fazer_checkin()
         return False
     
-    def fazer_checkout(self, codigo_estadia):
+    def fazer_checkout(self, codigo_estadia, data_checkout=None):
         """realiza checkout com validacao de data"""
         estadia = self.buscar_estadia_por_codigo(codigo_estadia)
         if not estadia or estadia.status != "Confirmada":
             return False, "Estadia não encontrada ou não está confirmada"
         
+        # Se não informar data, usa a data atual
+        if data_checkout is None:
+            data_checkout = date.today()
+        
         # validacao: checkout nao pode ser antes do checkin
-        data_hoje = date.today()
-        if data_hoje < estadia.data_entrada:
+        if data_checkout < estadia.data_entrada:
             return False, "Não é possível fazer checkout antes da data de entrada"
         
-        # realiza checkout
-        sucesso = estadia.fazer_checkout()
+        # realiza checkout com a data informada
+        sucesso = estadia.fazer_checkout(data_checkout)
         if sucesso:
             return True, estadia.valor_total
         return False, "Erro ao processar checkout"

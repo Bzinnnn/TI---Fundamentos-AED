@@ -63,15 +63,24 @@ class Estadia:
             return True
         return False
     
-    def fazer_checkout(self):
-        """realiza checkout validando datas"""
+    def fazer_checkout(self, data_checkout=None):
+        """realiza checkout validando datas e recalculando valores se necessário"""
         if self.status != "Confirmada":
             return False
         
+        # Se não informar data, usa a data atual
+        if data_checkout is None:
+            data_checkout = date.today()
+        
         # validacao: checkout nao pode ser antes da entrada
-        data_hoje = date.today()
-        if data_hoje < self.data_entrada:
+        if data_checkout < self.data_entrada:
             return False
+        
+        # Recalcula diárias e valor se a data de checkout for diferente da prevista
+        if data_checkout != self.data_saida:
+            self.data_saida = data_checkout
+            self.quantidade_diarias = self.calcular_diarias()
+            self.valor_total = self.calcular_valor_total()
         
         self.quarto.marcar_desocupado()
         self.concluir()
