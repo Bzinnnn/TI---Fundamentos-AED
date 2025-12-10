@@ -10,7 +10,7 @@ class SistemaHotel:
     """sistema de gerenciamento do hotel"""
     
     def __init__(self):
-        self.hotel = Hotel("Hotel 5 Estrelas - Empresa João Aguiar corporate")
+        self.hotel = Hotel("Villa Prado Resort  - Um Hotel 5 Estrelas")
         self.executando = True
         self.menu = MenuUI()
     
