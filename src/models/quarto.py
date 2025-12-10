@@ -8,7 +8,7 @@ class Quarto:
         self.tipo = tipo
         self.quantidade_hospedes = quantidade_hospedes
         self.preco_diaria = preco_diaria
-        self.status = "desocupado"
+        self.status = "Disponível"
     
     def __str__(self):
         return f"Quarto {self.numero} - {self.tipo} - Quantidade hospedes: {self.quantidade_hospedes} - R${self.preco_diaria:.2f}/diaria - {self.status}"
@@ -17,16 +17,25 @@ class Quarto:
         return f"<Quarto {self.numero}>"
     
     def marcar_ocupado(self):
-        if self.status == "desocupado":
-            self.status = "ocupado"
-            return True
-        return False
+        """Marca o quarto como ocupado"""
+        self.status = "Ocupado"
+        return True
     
     def marcar_desocupado(self):
-        self.status = "desocupado"
+        """Marca o quarto como desocupado/disponível"""
+        self.status = "Disponível"
+    
+    def marcar_disponivel(self):
+        """Alias para marcar_desocupado"""
+        self.status = "Disponível"
+    
+    def marcar_manutencao(self):
+        """Marca o quarto como em manutenção"""
+        self.status = "Manutenção"
     
     def esta_disponivel(self):
-        return self.status == "desocupado"
+        """Verifica se o quarto está disponível"""
+        return self.status == "Disponível"
     
     def to_dict(self):
         return {

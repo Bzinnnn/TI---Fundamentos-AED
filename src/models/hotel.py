@@ -108,12 +108,12 @@ class Hotel:
     def listar_quartos_disponiveis(self):
         disponiveis = []
         for quarto in self.quartos:
-            if quarto.status == "desocupado":
+            if quarto.status == "Disponível":
                 disponiveis.append(quarto)
         return disponiveis
     
     def listar_quartos_ocupados(self):
-        return [q for q in self.quartos if q.status == "ocupado"]
+        return [q for q in self.quartos if q.status == "Ocupado"]
     
     def listar_quartos_por_tipo(self, tipo):
         resultado = []
@@ -147,7 +147,7 @@ class Hotel:
                 continue
             
             # verifica status
-            if quarto.status != "desocupado":
+            if quarto.status != "Disponível":
                 continue
             
             # verifica disponibilidade no periodo
@@ -180,7 +180,7 @@ class Hotel:
         if not quarto:
             return None
         
-        if quarto.status != "desocupado":
+        if quarto.status != "Disponível":
             return None
         
         # valida datas
