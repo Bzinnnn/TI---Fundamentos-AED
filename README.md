@@ -283,21 +283,6 @@ OK
 
 Cada ponto (`.`) representa um teste que passou. Se todos os 48 testes passarem, o sistema está funcionando corretamente.
 
-### Cobertura dos Testes
-
-Os testes são organizados em 9 classes e validam:
-
-| Classe de Teste | Quantidade | Descrição |
-|----------------|------------|-----------|
-| `TestClientes` | 6 testes | Cadastro, busca, validação de estrutura |
-| `TestFuncionarios` | 6 testes | Cadastro, códigos únicos, pesquisa |
-| `TestQuartos` | 8 testes | Adição, status, validação de campos |
-| `TestEstadias` | 10 testes | Cadastro com busca automática, cálculos |
-| `TestPontosFidelidade` | 4 testes | Sistema de pontos (10 por diária) |
-| `TestPesquisas` | 6 testes | Pesquisas por nome, código, listagens |
-| `TestRelatorios` | 2 testes | Ocupação e receita |
-| `TestPersistencia` | 3 testes | Salvar/carregar dados em pickle |
-| `TestValidacoesRestricoes` | 3 testes | Regras de negócio e validações |
 
 ### Executando Testes Específicos
 
@@ -320,56 +305,6 @@ Para ver o nome de cada teste sendo executado:
 ```bash
 python tests/testes.py -v
 ```
-
----
-
-## Estrutura do Projeto
-
-```
-TI---Fundamentos-AED/
-│
-├── main.py                       # Ponto de entrada do sistema
-│
-├── src/                          # Código-fonte
-│   ├── models/                   # Camada de modelos (entidades)
-│   │   ├── hotel.py             # Classe principal (orquestra o sistema)
-│   │   ├── cliente.py           # Entidade Cliente
-│   │   ├── funcionario.py       # Entidade Funcionário
-│   │   ├── quarto.py            # Entidade Quarto
-│   │   └── estadia.py           # Entidade Estadia
-│   │
-│   ├── ui/                       # Interface do usuário
-│   │   └── menu.py              # Menus e navegação
-│   │
-│   └── utils/                    # Utilitários
-│       └── utils.py             # Funções auxiliares (validação, formatação)
-│
-├── data/                         # Dados persistidos
-│   └── hotel_dados.bin          # Arquivo pickle (criado automaticamente)
-│
-├── tests/                        # Testes automatizados
-│   └── testes.py                # 48 casos de teste
-│
-└── docs/                         # Documentação
-    ├── DOCUMENTACAO_TECNICA.md  # Documentação técnica detalhada
-    └── CASOS_DE_TESTE.md        # Especificação dos testes
-```
-TI---Fundamentos-AED/
-│
-├── 📄 main.py                    ← Execute este arquivo!
-## Tecnologias Utilizadas
-
-- **Linguagem:** Python 3.12
-- **Paradigma:** Programação Orientada a Objetos (POO)
-- **Bibliotecas padrão utilizadas:**
-  - `datetime` - Manipulação de datas e cálculos temporais
-  - `pickle` - Serialização e persistência de objetos
-  - `os` - Operações com sistema de arquivos
-  - `sys` - Configurações do sistema e caminhos
-
-
-```
-
 ---
 
 ## Tecnologias Usadas
